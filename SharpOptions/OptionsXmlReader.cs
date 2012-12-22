@@ -6,7 +6,7 @@ using System.Xml;
 
 namespace SharpOptions
 {
-   class OptionsReaderXml : OptionsReader
+   class OptionsXmlReader : OptionsReader
    {
       const string Option = "option";
       const string Name = "name";
@@ -15,7 +15,7 @@ namespace SharpOptions
       string filename;
       XmlDocument doc;
 
-      public OptionsReaderXml(string loadPath)
+      public OptionsXmlReader(string loadPath)
       {
          filename = loadPath+"cfg.xml";
       }

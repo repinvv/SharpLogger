@@ -3,17 +3,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Autofac;
 using SharpOptions;
 
 namespace SharpLogger
 {
    class LogDefaultOptions
    {
-      IOptions options;
-      public LogDefaultOptions(IOptions options)
+      public static void AddDefaultOptions(IOptions options)
       {
-         this.options = options;
          options.TryAdd("LogMessageFormat", "basic");
          options.TryAdd("LogDateTimeFormat", "dd-MM-yyyy HH.mm.ss");
          options.TryAdd("LogMilisecondsFormat", ":{0:000}");
@@ -27,11 +24,6 @@ namespace SharpLogger
          options.TryAdd(EventOption, "Событие");
          options.TryAdd(DebugOption, "Отладка");
          options.TryAdd(AllOption, "Детальная отладка");
-      }
-
-      public IOptions GetOptions()
-      {
-         return options;
       }
 
       public const string AlwaysOption = "LogAlwaysString";

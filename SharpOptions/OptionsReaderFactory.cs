@@ -5,17 +5,55 @@ using System.Text;
 
 namespace SharpOptions
 {
-  class OptionsReaderFactory
-  {
-     public OptionsReader CreateOptionsAccess(string loadPath)
+    public enum OptionsReaderType
     {
-      OptionsReader options;
-      options = new OptionsReaderXml(loadPath);
-      if (options.CanRead)
-      {
-         return options;
-      }
-      return new OptionsReaderText(loadPath);
+        Default,
+        TextFile,
+        XmlFile,
+        Database
     }
-  }
+
+    class OptionsReaderFactory
+    {
+        public OptionsReader CreateOptionsAccess(OptionsReaderType type, string path, string name)
+        {            
+            OptionsReader options;
+            switch (type)
+            {
+                case OptionsReaderType.Default:
+                    options = ReaderCheck(new OptionsXmlReader(path + name));
+                    if (options is OptionsNullReader)
+                    {
+                        options = ReaderCheck(new OptionsTextReader(path + name));
+                    }
+                    break;
+                case OptionsReaderType.TextFile:
+                    options = ReaderCheck(new OptionsTextReader(path + name));
+                    break;
+                case OptionsReaderType.XmlFile:
+                    options = ReaderCheck(new OptionsXmlReader(path + name));
+                    break;
+                case OptionsReaderType.Database:
+                    options = ReaderCheck(new OptionsDatabaseReader(path, name));
+                    break;
+                default:
+                    options = new OptionsNullReader();
+                    break;
+            }
+            return options;
+
+        }
+
+        public OptionsReader ReaderCheck(OptionsReader reader)
+        {
+            if (reader.CanRead)
+            {
+                return reader;
+            }
+            else
+            {
+                return new OptionsNullReader();
+            }
+        }
+    }
 }

@@ -20,7 +20,7 @@ namespace SharpLogger
       {
          this.category = category;
          senders[0] = NullSend;
-         senders[1] = sender;
+         senders[1] = sender ?? NullSend;
          SetLevel(level);
       }
 
@@ -33,6 +33,17 @@ namespace SharpLogger
             else
                senders[n] = senders[1];
          }
+      }
+
+      public void SetSender(Sender sender)
+      {
+          for (int n = 0; n < LogLevel.Total; n++)
+          {
+              if (senders[n] != NullSend)
+              {
+                  senders[n] = sender ?? NullSend;
+              }
+          }
       }
 
       public bool this[int level]

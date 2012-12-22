@@ -8,7 +8,6 @@ using System.Threading;
 namespace LoggerTest
 {
 
-
    /// <summary>
    ///This is a test class for LoggerFactoryTest and is intended
    ///to contain all LoggerFactoryTest Unit Tests
@@ -25,7 +24,8 @@ namespace LoggerTest
          var builder = new ContainerBuilder();
 
          builder
-            .Register<LoggerContainer>((c, p) => new LoggerContainer(c.Resolve<IComponentContext>()));
+            .Register<LoggerContainer>((c, p) => new LoggerContainer(new OptionsMock(),
+                (string name) => new LoggerMock(name, LogLevel.Info)));
 
          builder
             .RegisterType<LoggerMock>()

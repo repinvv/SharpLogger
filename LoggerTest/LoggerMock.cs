@@ -92,5 +92,10 @@ namespace LoggerTest
       {
          throw new NotImplementedException();
       }
+
+      public void SetSender(Sender sender)
+      {
+          throw new NotImplementedException();
+      }
    }
 }

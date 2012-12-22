@@ -71,7 +71,7 @@ namespace LoggerTest
       [TestMethod()]
       public void GetWriterTest()
       {
-         IOptions options = new Options("Log");
+         IOptions options = new Options("","Log");
          LogWriterFactory target = new LogWriterFactory(options);
          ILogWriter actual;
          actual = target.GetWriter();

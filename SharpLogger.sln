@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpLogger", "SharpLogger\SharpLogger.csproj", "{AE0D77E2-B55E-4690-B51D-1EC60EB0BE93}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpOptions", "SharpOptions\SharpOptions.csproj", "{EED9924F-1BC7-415C-A763-04C7226315AB}"
@@ -40,8 +40,8 @@ Global
 		{AE0D77E2-B55E-4690-B51D-1EC60EB0BE93}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{AE0D77E2-B55E-4690-B51D-1EC60EB0BE93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE0D77E2-B55E-4690-B51D-1EC60EB0BE93}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AE0D77E2-B55E-4690-B51D-1EC60EB0BE93}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{AE0D77E2-B55E-4690-B51D-1EC60EB0BE93}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AE0D77E2-B55E-4690-B51D-1EC60EB0BE93}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{AE0D77E2-B55E-4690-B51D-1EC60EB0BE93}.Release|Mixed Platforms.Build.0 = Release|x86
 		{AE0D77E2-B55E-4690-B51D-1EC60EB0BE93}.Release|x64.ActiveCfg = Release|x64
 		{AE0D77E2-B55E-4690-B51D-1EC60EB0BE93}.Release|x64.Build.0 = Release|x64
 		{AE0D77E2-B55E-4690-B51D-1EC60EB0BE93}.Release|x86.ActiveCfg = Release|Any CPU
@@ -54,8 +54,8 @@ Global
 		{EED9924F-1BC7-415C-A763-04C7226315AB}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{EED9924F-1BC7-415C-A763-04C7226315AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EED9924F-1BC7-415C-A763-04C7226315AB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EED9924F-1BC7-415C-A763-04C7226315AB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{EED9924F-1BC7-415C-A763-04C7226315AB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{EED9924F-1BC7-415C-A763-04C7226315AB}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{EED9924F-1BC7-415C-A763-04C7226315AB}.Release|Mixed Platforms.Build.0 = Release|x86
 		{EED9924F-1BC7-415C-A763-04C7226315AB}.Release|x64.ActiveCfg = Release|x64
 		{EED9924F-1BC7-415C-A763-04C7226315AB}.Release|x64.Build.0 = Release|x64
 		{EED9924F-1BC7-415C-A763-04C7226315AB}.Release|x86.ActiveCfg = Release|Any CPU
@@ -76,6 +76,7 @@ Global
 		{3A2DCC12-34D3-4FB6-97A8-5A3A7CE82245}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3A2DCC12-34D3-4FB6-97A8-5A3A7CE82245}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A2DCC12-34D3-4FB6-97A8-5A3A7CE82245}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3A2DCC12-34D3-4FB6-97A8-5A3A7CE82245}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{3A2DCC12-34D3-4FB6-97A8-5A3A7CE82245}.Debug|x64.ActiveCfg = Debug|x64
 		{3A2DCC12-34D3-4FB6-97A8-5A3A7CE82245}.Debug|x64.Build.0 = Debug|x64
 		{3A2DCC12-34D3-4FB6-97A8-5A3A7CE82245}.Debug|x86.ActiveCfg = Debug|Any CPU

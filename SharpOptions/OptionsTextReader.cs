@@ -6,7 +6,7 @@ using System.IO;
 
 namespace SharpOptions
 {
-   class OptionsReaderText : OptionsReader
+   class OptionsTextReader : OptionsReader
    {
       const int BufSize = 65536;
       string[] LineSeparators = new string[] { "\r\n", "\n" };
@@ -14,7 +14,7 @@ namespace SharpOptions
 
       string filename;
 
-      public OptionsReaderText(string loadPath)
+      public OptionsTextReader(string loadPath)
       {
          filename = loadPath + ".cfg";
       }

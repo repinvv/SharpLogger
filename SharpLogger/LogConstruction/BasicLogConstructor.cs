@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SharpOptions;
 
 namespace SharpLogger
 {
@@ -9,17 +10,17 @@ namespace SharpLogger
    {
       String[] levels;
 
-      public BasicLogConstructor()
+      public BasicLogConstructor(IOptions options)
       {
          levels = new string[LogLevel.Total];
-         levels[LogLevel.Always] = LogConfig.Options[LogDefaultOptions.AlwaysOption];
-         levels[LogLevel.Fatal] = LogConfig.Options[LogDefaultOptions.FatalOption];
-         levels[LogLevel.Error] = LogConfig.Options[LogDefaultOptions.ErrorOption];
-         levels[LogLevel.Warning] = LogConfig.Options[LogDefaultOptions.WarningOption];
-         levels[LogLevel.Info] = LogConfig.Options[LogDefaultOptions.InfoOption];
-         levels[LogLevel.Event] = LogConfig.Options[LogDefaultOptions.EventOption];
-         levels[LogLevel.Debug] = LogConfig.Options[LogDefaultOptions.DebugOption];
-         levels[LogLevel.All] = LogConfig.Options[LogDefaultOptions.AllOption]; 
+         levels[LogLevel.Always] = options[LogDefaultOptions.AlwaysOption];
+         levels[LogLevel.Fatal] = options[LogDefaultOptions.FatalOption];
+         levels[LogLevel.Error] = options[LogDefaultOptions.ErrorOption];
+         levels[LogLevel.Warning] = options[LogDefaultOptions.WarningOption];
+         levels[LogLevel.Info] = options[LogDefaultOptions.InfoOption];
+         levels[LogLevel.Event] = options[LogDefaultOptions.EventOption];
+         levels[LogLevel.Debug] = options[LogDefaultOptions.DebugOption];
+         levels[LogLevel.All] = options[LogDefaultOptions.AllOption]; 
       }
 
       private void AppendIdString(StringBuilder sb, int[] ids)

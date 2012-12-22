@@ -1,84 +1,100 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Autofac;
 using SharpOptions;
 namespace SharpLogger
 {
-   class LoggerContainer
-   {
-      IComponentContext context;
-      ConcurrentDictionary<string, InternalLogger> loggers;
+    delegate InternalLogger LogCreate(string category);
 
-      public LoggerContainer(IComponentContext context)
-      {
-         this.context = context;
-         loggers = new ConcurrentDictionary<string, InternalLogger>();
-      }
+    class LoggerContainer
+    {
+        IOptions options;
+        Dictionary<string, InternalLogger> loggers =
+            new Dictionary<string, InternalLogger>();
+        LogCreate logCreate;
 
-      private InternalLogger CreateLogger(string category)
-      {
-         return context
-            .Resolve<InternalLogger>(new NamedParameter[]{
-               new NamedParameter("category", category),
-               new NamedParameter("level",LogLevel.Default)
-            });
-      }
+        public LoggerContainer(IOptions options, LogCreate logCreate)
+        {
+            this.options = options;
+            this.logCreate = logCreate;
+        }
 
-      public InternalLogger GetLogger(string category)
-      {
-         if (category == null || category == string.Empty)
-         {
-            category = context
-               .Resolve<IOptions>()
-               .Get("LogDefaultCategory", "Default");
-         }
-         InternalLogger logger = null;
-         lock (loggers)
-         {
-            if (loggers.TryGetValue(category, out logger))
+        public InternalLogger GetLogger(string category)
+        {
+            if (category == null || category == string.Empty)
             {
-               return logger;
+                options.Get("LogDefaultCategory", "Default");
             }
-            var newlogger = CreateLogger(category);
-            while (!loggers.TryGetValue(category, out logger))
+            InternalLogger logger = null;
+            lock (loggers)
             {
-               loggers.TryAdd(category, newlogger);
+                if (loggers.TryGetValue(category, out logger))
+                {
+                    return logger;
+                }
+                logger = logCreate(category);
+                loggers.Add(category, logger);
             }
-         }
-         return logger;
-      }
+            return logger;
+        }
 
-      public void SetLevel(string category, int level)
-      {
-         InternalLogger logger;
-         if (loggers.TryGetValue(category, out logger))
-         {
-            logger.SetLevel(level);
-         }
-      }
+        public void SetSender(Sender send)
+        {
+            lock (loggers)
+            {
+                foreach (var pair in loggers)
+                {
+                    pair.Value.SetSender(send);
+                }
+            }
+        }
 
-      public void SetOneLevel(string category, int level, bool value)
-      {
-         InternalLogger logger;
-         if (loggers.TryGetValue(category, out logger))
-         {
-            logger[level] = value;
-         }
-      }
+        public void SetLevel(string category, int level)
+        {
+            InternalLogger logger;
+            lock (loggers)
+            {
+                if (loggers.TryGetValue(category, out logger))
+                {
+                    logger.SetLevel(level);
+                }
+            }
+        }
 
-      public void SetLevelForAll(int level)
-      {
-         foreach (var x in loggers)
-            x.Value.SetLevel(level);
-      }
+        public void SetOneLevel(string category, int level, bool value)
+        {
+            InternalLogger logger;
+            lock (loggers)
+            {
+                if (loggers.TryGetValue(category, out logger))
+                {
+                    logger[level] = value;
+                }
+            }
+        }
 
-      public void SetOneLevelForAll(int level, bool value)
-      {
-         foreach (var x in loggers)
-            x.Value[level] = value;
-      }
+        public void SetLevelForAll(int level)
+        {
+            lock (loggers)
+            {
+                foreach (var pair in loggers)
+                {
+                    pair.Value.SetLevel(level);
+                }
+            }
+        }
 
-   }
+        public void SetOneLevelForAll(int level, bool value)
+        {
+            lock (loggers)
+            {
+                foreach (var x in loggers)
+                {
+                    x.Value[level] = value;
+                }
+            }
+        }
+
+    }
 }

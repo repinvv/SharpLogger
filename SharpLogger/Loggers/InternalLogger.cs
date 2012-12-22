@@ -5,10 +5,11 @@ using System.Text;
 
 namespace SharpLogger
 {
-   interface InternalLogger : Logger
-   {
-      void SetLevel(int level);
+    interface InternalLogger : Logger
+    {
+        void SetLevel(int level);
+        void SetSender(Sender sender);
 
-      bool this[int level] {set;}
-   }
+        bool this[int level] { set; }
+    }
 }

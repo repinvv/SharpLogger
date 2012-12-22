@@ -29,7 +29,7 @@ namespace SharpLogger
                      options["LogMilisecondsFormat"]));
                break;
             case 'l':
-               AddConstructor(new CLCLevelAppender());
+               AddConstructor(new CLCLevelAppender(options));
                break;
             case 'i':
                AddConstructor(new CLCIdAppender(options["LogIDSplitChar"]));
@@ -82,7 +82,7 @@ namespace SharpLogger
       {
          string messageFormat = options["LogMessageFormat"];
          if (messageFormat == "basic" || messageFormat.Length < 5)
-            return new BasicLogConstructor();
+            return new BasicLogConstructor(options);
          first = null;
          sb = new StringBuilder();
          buffer.Clear();
