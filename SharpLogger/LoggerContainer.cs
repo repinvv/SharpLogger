@@ -9,22 +9,22 @@ namespace SharpLogger
 
     class LoggerContainer
     {
-        IOptions options;
         Dictionary<string, InternalLogger> loggers =
             new Dictionary<string, InternalLogger>();
         LogCreate logCreate;
 
-        public LoggerContainer(IOptions options, LogCreate logCreate)
+        public LoggerContainer(LogCreate logCreate)
         {
-            this.options = options;
             this.logCreate = logCreate;
         }
 
+        public string DefaultCategory { set; private get; }
+
         public InternalLogger GetLogger(string category)
         {
-            if (category == null || category == string.Empty)
+            if (string.IsNullOrEmpty(category))
             {
-                options.Get("LogDefaultCategory", "Default");
+                category = DefaultCategory;
             }
             InternalLogger logger = null;
             lock (loggers)

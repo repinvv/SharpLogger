@@ -16,7 +16,7 @@ namespace SharpOptions
     class OptionsReaderFactory
     {
         public OptionsReader CreateOptionsAccess(OptionsReaderType type, string path, string name)
-        {            
+        {
             OptionsReader options;
             switch (type)
             {

@@ -8,7 +8,6 @@ using System.Collections.Generic;
 namespace SharpLogger
 {
     //entry point static class for the logger
-
     public static class LogAccess
     {
         static bool init = false;
@@ -16,55 +15,94 @@ namespace SharpLogger
         static Logger nullLogger = new NullLogger();
         static LogCollector collector;
         static LoggerContainer container;
-
+        static IOptions options = null;
 
         static LogAccess()
         {
-
-
         }
 
-        static void Init()
-        {
-            IOptions options = new Options("", "Log");
-            LogDefaultOptions.AddDefaultOptions(options);
-            collector = new LogCollector(new LockQueued<LogItem>(new PoolThreadStarter()),
-                new LogWriterFactory(options).GetWriter());
-            container = new LoggerContainer(options,
-                (string category) =>
-                { return new CheckingLogger(category, collector.Send, LogLevel.Default); });
-            init = true;
-        }
         /// <summary>
-        /// Initiates logger with options read from database.
+        /// Initiates logging.
         /// </summary>
-        /// <param name="connectionString">Connection string for the database</param>
-        /// <param name="tableName">Table name to read options from</param>
-        static public void DataBaseInit(string connectionString, string tableName)
+        static public void Init()
         {
             lock (sync)
             {
-                IOptions options;
-                options = new Options(connectionString, tableName, OptionsReaderType.Database);
-                LogDefaultOptions.AddDefaultOptions(options);
-                if (collector != null)
-                {
-                    collector.ShutDown();
-                }
-                collector = new LogCollector(new LockQueued<LogItem>(new PoolThreadStarter()),
-                    new LogWriterFactory(options).GetWriter());
-                if (container == null)
-                {
-                    container.SetSender(collector.Send);
-                }
-                else
-                {
-                    container = new LoggerContainer(options,
-                        (string category) =>
-                        { return new CheckingLogger(category, collector.Send, LogLevel.Default); });
-                }
-                init = true;
+                options = null;
+                InitBody();
             }
+        }
+
+        /// <summary>
+        /// Initiates logger with options.
+        /// Used options keys are:
+        /// ---text output---
+        /// LogFormat - see instruction
+        /// ---levels---
+        ///LogAlwaysString
+        ///LogFatalString
+        ///LogErrorString
+        ///LogWarningString
+        ///LogInfoString
+        ///LogEventString
+        ///LogDebugString
+        ///LogAllString
+        /// ---category---
+        ///LogDefaultCategory
+        /// ---time format---
+        ///LogDateTimeFormat
+        ///LogMilisecondsFormat
+        /// ---Char to put between multiple id---
+        ///LogIDSplitChar
+        ///---Writer selector---
+        ///LogWriteTarget - can be File or Database
+        /// ---File writer options---
+        ///LogFileFlush
+        ///LogFileAppend
+        ///LogRotationSizeMb
+        ///LogRotationFiles
+        ///---Database writer
+        ///LogConnectionString
+        ///LogWriteTable
+        ///LogDataFlush
+        /// </summary>
+        /// <param name="connectionString">Connection string for the database</param>
+        /// <param name="tableName">Table name to read options from</param>
+        /// 
+        static public void Init(IOptions options)
+        {
+            lock (sync)
+            {
+                LogAccess.options = options;
+                InitBody();
+            }
+        }
+
+        static void InitBody()
+        {
+            if (options == null)
+            {
+                options = new Options("", "Log");
+            }
+            LogDefaultOptions.AddDefaultOptions(options);
+            if (collector != null)
+            {
+                collector.ShutDown();
+            }
+            collector = new LogCollector(new LockQueued<LogItem>(new PoolThreadStarter()),
+                new LogWriterFactory(options).GetWriter());
+
+            if (container == null)
+            {
+                container = new LoggerContainer((string category) =>
+                    { return new CheckingLogger(category, collector.Send, LogLevel.Default); });
+            }
+            else
+            {
+                container.SetSender(collector.Send);
+            }
+            container.DefaultCategory = options.Get("LogDefaultCategory", "Default");
+            init = true;
         }
 
         /// <summary>
@@ -92,7 +130,7 @@ namespace SharpLogger
             {
                 if (!init)
                 {
-                    Init();
+                    InitBody();
                 }
                 container.SetLevel(category, level);
             }
@@ -110,7 +148,7 @@ namespace SharpLogger
             {
                 if (!init)
                 {
-                    Init();
+                    InitBody();
                 }
                 container.SetOneLevel(category, level, value);
             }
@@ -126,7 +164,7 @@ namespace SharpLogger
             {
                 if (!init)
                 {
-                    Init();
+                    InitBody();
                 }
                 container.SetLevelForAll(level);
             }
@@ -143,7 +181,7 @@ namespace SharpLogger
             {
                 if (!init)
                 {
-                    Init();
+                    InitBody();
                 }
                 container.SetOneLevelForAll(level, value);
             }
@@ -161,7 +199,7 @@ namespace SharpLogger
             {
                 if (!init)
                 {
-                    Init();
+                    InitBody();
                 }
                 logger = container.GetLogger(category);
             }
@@ -206,7 +244,7 @@ namespace SharpLogger
             {
                 if (!init)
                 {
-                    Init();
+                    InitBody();
                 }
                 collector.FilterAddID(id);
             }
@@ -227,7 +265,7 @@ namespace SharpLogger
             {
                 if (!init)
                 {
-                    Init();
+                    InitBody();
                 }
                 collector.FilterRemoveID(id);
             }
@@ -242,11 +280,10 @@ namespace SharpLogger
             {
                 if (!init)
                 {
-                    Init();
+                    InitBody();
                 }
                 collector.FilterClear();
             }
         }
-
     }
 }

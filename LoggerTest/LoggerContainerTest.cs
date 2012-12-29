@@ -24,8 +24,7 @@ namespace LoggerTest
          var builder = new ContainerBuilder();
 
          builder
-            .Register<LoggerContainer>((c, p) => new LoggerContainer(new OptionsMock(),
-                (string name) => new LoggerMock(name, LogLevel.Info)));
+            .Register<LoggerContainer>((c, p) => new LoggerContainer((string name) => new LoggerMock(name, LogLevel.Info)));
 
          builder
             .RegisterType<LoggerMock>()

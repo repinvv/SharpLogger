@@ -132,6 +132,7 @@
     <Compile Include="Loggers\RegularLogger.cs" />
     <Compile Include="LogItem.cs" />
     <Compile Include="LogLevel.cs" />
+    <Compile Include="LogWrite\LogDatabaseWriter.cs" />
     <Compile Include="LogWrite\LogFileWriter.cs" />
     <Compile Include="LogWrite\LogWriter.cs" />
     <Compile Include="LogWrite\LogWriterFactory.cs" />

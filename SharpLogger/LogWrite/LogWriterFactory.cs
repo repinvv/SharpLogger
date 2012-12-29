@@ -6,12 +6,6 @@ using SharpOptions;
 
 namespace SharpLogger
 {
-    enum WriterType
-    {
-        Default = 0,
-        File,
-        Database
-    }
 
     class LogWriterFactory
     {
@@ -22,25 +16,13 @@ namespace SharpLogger
             this.options = options;
         }
 
-        ILogWriter GetDefaultWriter()
+        public ILogWriter GetWriter()
         {
-            switch (options["LogWriteTarget"].ToLower())
+            switch (options["LogWriteTarget"])
             {
-                case "file":
-                default:
-                    return new LogFileWriter((new LogConstructorFactory(options)).GetLogConstructor(), options);
-            }
-        }
-
-        public ILogWriter GetWriter(WriterType writerType = WriterType.Default)
-        {
-            switch (writerType)
-            {
-                case WriterType.Default:
-                    return GetDefaultWriter();
-                case WriterType.Database:
-                    return null;
-                case WriterType.File:
+                case "Database":
+                    return new LogDatabaseWriter(options);
+                case "File":
                 default:
                     return new LogFileWriter((new LogConstructorFactory(options)).GetLogConstructor(), options);
             }

@@ -5,8 +5,8 @@ using System.Text;
 
 namespace SharpLogger
 {
-  interface ILogConstructor
-  {
-    void ConstructLine(StringBuilder sb, LogItem item);
-  }  
+    interface ILogConstructor
+    {
+        void ConstructLine(StringBuilder sb, LogItem item);
+    }
 }

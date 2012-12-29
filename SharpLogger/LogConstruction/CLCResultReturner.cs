@@ -5,10 +5,10 @@ using System.Text;
 
 namespace SharpLogger
 {
-   class CLCResultReturner : ConfigurableLogConstructor
-   {
-      public override void ConstructLine(StringBuilder sb, LogItem item)
-      {
-      }
-   }
+    class CLCResultReturner : ConfigurableLogConstructor
+    {
+        public override void ConstructLine(StringBuilder sb, LogItem item)
+        {
+        }
+    }
 }

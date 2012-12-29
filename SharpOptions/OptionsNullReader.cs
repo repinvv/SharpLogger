@@ -19,7 +19,7 @@ namespace SharpOptions
 
         public void WriteOptions(IEnumerable<KeyValuePair<string, string>> options)
         {
-            
+
         }
     }
 }

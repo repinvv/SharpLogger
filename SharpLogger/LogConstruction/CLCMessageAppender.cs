@@ -5,13 +5,13 @@ using System.Text;
 
 namespace SharpLogger
 {
-  class CLCMessageAppender : ConfigurableLogConstructor
-  {
-
-     public override void ConstructLine(StringBuilder sb, LogItem item)
+    class CLCMessageAppender : ConfigurableLogConstructor
     {
-      sb.Append(item.message);
-      next.ConstructLine(sb, item);
+
+        public override void ConstructLine(StringBuilder sb, LogItem item)
+        {
+            sb.Append(item.message);
+            next.ConstructLine(sb, item);
+        }
     }
-  }
 }

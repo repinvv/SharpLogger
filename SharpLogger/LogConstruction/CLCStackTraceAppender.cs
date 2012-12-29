@@ -5,14 +5,14 @@ using System.Text;
 
 namespace SharpLogger
 {
-   class CLCStackTraceAppender : ConfigurableLogConstructor
-   {
+    class CLCStackTraceAppender : ConfigurableLogConstructor
+    {
 
-      public override void ConstructLine(StringBuilder sb, LogItem item)
-      {
-         if (item.ex != null)
-            sb.Append(item.ex.StackTrace);
-         next.ConstructLine(sb, item);
-      }
-   }
+        public override void ConstructLine(StringBuilder sb, LogItem item)
+        {
+            if (item.ex != null)
+                sb.Append(item.ex.StackTrace);
+            next.ConstructLine(sb, item);
+        }
+    }
 }
