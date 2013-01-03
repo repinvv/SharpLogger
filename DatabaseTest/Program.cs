@@ -57,22 +57,29 @@ namespace DatabaseTest
                 string.Format(@"Data Source=(LocalDb)\v11.0;Initial Catalog={0};AttachDBFilename={1}\{2}.mdf"
                 , dbName, pwd, dbName);
 
-            IOptions options = new Options(connectionString, dbName + ".dbo.LogOptions", OptionsReaderType.Database);           
+            IOptions options = new Options(connectionString, dbName + ".dbo.LogOptions", OptionsReaderType.Database);
             options["LogWriteTarget"] = "Database";
             options["LogConnectionString"] = connectionString;
             options["LogWriteTable"] = dbName + ".dbo.LogOutput";
+            options["LogDaysToKeep"] = "1";
             LogAccess.Init(options);
             options.Save();
 
-            var logger = LogAccess.GetLogger("a[ny]string[']poss[i]ble");
-            logger.Info("info",new int[]{1,2,3});            
-            try
-            {             
-                Console.Write(submain(0));
-            }
-            catch (Exception ex)
+            var logger = LogAccess.GetLogger("alogger");
+            for (int n = 0; n < 30; n++)
             {
-                logger.Error("happy' erro'''r'", ex);
+                try
+                {
+                    Console.Write(submain(0));
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("happy error", ex);
+                }
+            }
+            for (int n = 0; n < 10000; n++)
+            {
+                logger.Info("info" + n, new int[] { n, 2, 3 });
             }
             Console.ReadKey();
         }

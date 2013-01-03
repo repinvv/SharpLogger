@@ -136,15 +136,10 @@
     <Compile Include="LogWrite\LogFileWriter.cs" />
     <Compile Include="LogWrite\LogWriter.cs" />
     <Compile Include="LogWrite\LogWriterFactory.cs" />
+    <Compile Include="NotQueued.cs" />
     <Compile Include="PoolThreadStarter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegularThreadStarter.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="NLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SharpOptions\SharpOptions.csproj">

@@ -57,14 +57,16 @@ namespace SharpLogger
         ///---Writer selector---
         ///LogWriteTarget - can be File or Database
         /// ---File writer options---
+        ///WorkingDir
         ///LogFileFlush
         ///LogFileAppend
         ///LogRotationSizeMb
         ///LogRotationFiles
-        ///---Database writer
+        ///---Database writer options---
         ///LogConnectionString
         ///LogWriteTable
         ///LogDataFlush
+        ///LogDaysToKeep
         /// </summary>
         /// <param name="connectionString">Connection string for the database</param>
         /// <param name="tableName">Table name to read options from</param>
@@ -89,7 +91,7 @@ namespace SharpLogger
             {
                 collector.ShutDown();
             }
-            collector = new LogCollector(new LockQueued<LogItem>(new PoolThreadStarter()),
+            collector = new LogCollector(new ConcurrentQueued<LogItem>(new PoolThreadStarter()),
                 new LogWriterFactory(options).GetWriter());
 
             if (container == null)

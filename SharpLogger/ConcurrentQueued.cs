@@ -10,6 +10,7 @@ namespace SharpLogger
     {
         bool active = false;
         int timeout = Timeout.Infinite;
+        string exm;
         ConcurrentQueue<T> queue = new ConcurrentQueue<T>();
         EventWaitHandle[] events = new EventWaitHandle[2];
 
@@ -95,10 +96,10 @@ namespace SharpLogger
             }
             catch (Exception ex)
             {
-                var file = new FileStream("logfail", FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
-                var bytes = UTF8Encoding.UTF8.GetBytes(ex.Message + "\n" + ex.StackTrace);
-                file.Write(bytes, 0, bytes.Length);
-                file.Close();
+                exm = ex.Message;
+                exm = ex.StackTrace;
+                timeout = ex.StackTrace.Length;
+                //fail silently
             }
 
         }

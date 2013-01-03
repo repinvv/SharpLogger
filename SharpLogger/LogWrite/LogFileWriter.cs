@@ -29,7 +29,16 @@ namespace SharpLogger
                 flushTimeout = Timeout.Infinite;
             }
             forceFlush = TimeSpan.FromSeconds((double)flushTimeout / 500);
-            string dirname = options["ProgramDir"] + "logs/";
+            string dirname = options["WorkingDir"];
+            dirname.Replace('\\', '/');
+            if (dirname!=string.Empty && dirname.Last() != '/')
+            {
+                dirname += "/logs/";
+            }
+            else
+            {
+                dirname += "logs/";
+            }
             Directory.CreateDirectory(dirname);
             rotationSize = (1 << 20) * options.GetInt("LogRotationSizeMb", 5);
             fileName = new string[options.GetInt("LogRotationFiles", 5)];
