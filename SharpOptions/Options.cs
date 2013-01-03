@@ -16,9 +16,17 @@ namespace SharpOptions
         public Options(string path, string name, OptionsReaderType type = OptionsReaderType.Default)
         {
             options = new ConcurrentDictionary<string, string>();
-            if (type != OptionsReaderType.Database && string.IsNullOrEmpty(path))
+            if (type != OptionsReaderType.Database)
             {
-                    path = Directory.GetCurrentDirectory();                
+                if (string.IsNullOrEmpty(path))
+                {
+                    path = Directory.GetCurrentDirectory();
+                }
+                path = path.Replace('\\', '/');
+                if (path.Last() != '/')
+                {
+                    path += '/';
+                }                
             }
             optionsAccess = new OptionsReaderFactory().CreateOptionsReader(type, path, name);
             ReadOptions();
