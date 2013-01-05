@@ -45,6 +45,13 @@ namespace SharpLogger
         void Warning(string message, int[] id, Exception ex = null);
 
         /// <summary>
+        /// Method for external errors, such as user-input or file access.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="ex"></param>
+        void Warning(string message, Exception ex);
+
+        /// <summary>
         /// Method to log global stages of program execution.
         /// Default level.
         /// </summary>

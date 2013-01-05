@@ -83,6 +83,14 @@ namespace SharpLogger
             }
         }
 
+        public void Warning(string message, Exception ex)
+        {
+            if (levels[LogLevel.Warning])
+            {
+                send(new LogItem(category, LogLevel.Warning, message, ex: ex));
+            }
+        }
+
         public void Info(string message, int id = 0)
         {
             if (levels[LogLevel.Info])

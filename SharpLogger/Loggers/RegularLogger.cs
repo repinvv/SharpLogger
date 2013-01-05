@@ -90,6 +90,11 @@ namespace SharpLogger
             senders[LogLevel.Warning](new LogItem(category, LogLevel.Warning, message, id, ex));
         }
 
+        public void Warning(string message, Exception ex)
+        {
+            senders[LogLevel.Warning](new LogItem(category, LogLevel.Warning, message, ex: ex));
+        }
+
         public void Info(string message, int id = 0)
         {
             senders[LogLevel.Info](new LogItem(category, LogLevel.Info, message, id));

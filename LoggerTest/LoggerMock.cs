@@ -97,5 +97,11 @@ namespace LoggerTest
       {
           throw new NotImplementedException();
       }
+
+
+      public void Warning(string message, Exception ex)
+      {
+          throw new NotImplementedException();
+      }
    }
 }
