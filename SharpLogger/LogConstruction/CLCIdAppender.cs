@@ -7,18 +7,18 @@ namespace SharpLogger
 {
     class CLCIdAppender : ConfigurableLogConstructor
     {
-        char idSplitChar;
+        string idSplit;
+        string bracketLeft;
+        string bracketRight;
 
-        public CLCIdAppender(string idSplit)
+        public CLCIdAppender(string idSplit, string bracketLeft, string bracketRight)
         {
-            if (idSplit == string.Empty)
-            {
-                this.idSplitChar = ' ';
-            }
-            else
-            {
-                this.idSplitChar = idSplit[0];
-            }
+            this.bracketLeft = bracketLeft;
+            this.bracketRight = bracketRight;
+            this.idSplit = string.IsNullOrEmpty(idSplit) 
+                ? " " 
+                : idSplit.Substring(0,1);
+            
         }
 
         public override void ConstructLine(StringBuilder sb, LogItem item)
@@ -28,13 +28,14 @@ namespace SharpLogger
             {
                 if (id != default(int))
                 {
-                    if (!first)
-                    {
-                        sb.Append(idSplitChar);
-                    }
+                    sb.Append(first? bracketLeft : idSplit);                    
                     first = false;
                     sb.Append(id.ToString());
                 }
+            }
+            if (!first)
+            {
+                sb.Append(bracketRight);
             }
             next.ConstructLine(sb, item);
         }

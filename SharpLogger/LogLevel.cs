@@ -18,6 +18,41 @@ namespace SharpLogger
         public const int All = 8;
         public const int Total = 9;
         private static int _default = Info;
+        private static string[] levels = new string[Total];
+
+        internal static void SetLevel(int level, string LevelString)
+        {
+            if (isLevelValid(level))
+            {
+                levels[level] = LevelString;
+            }
+        }
+
+        internal static string GetLevel(int level)
+        {
+            if (isLevelValid(level))
+            {
+                return levels[level];
+            }
+            return levels[_default];
+        }
+
+        internal static void SetDefault(string levelString)
+        {
+            for (int n = 0; n < levels.Length; n++)
+            {
+                if (levels[n] == levelString)
+                {
+                    _default = n;
+                    return;
+                }
+            }
+            int level;
+            if (int.TryParse(levelString, out level))
+            {
+                Default = level;
+            }
+        }
 
         internal static int Default
         {

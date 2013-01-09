@@ -51,7 +51,7 @@ namespace LoggerTest
 
       internal override ILogConstructor CreateLogConstructor()
       {
-         var item = new CLCLevelAppender(new OptionsMock());
+         var item = new CLCLevelAppender();
          item.Chain(new CLCResultReturner());
          return item;
       }

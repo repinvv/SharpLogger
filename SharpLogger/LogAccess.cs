@@ -39,6 +39,7 @@ namespace SharpLogger
         /// ---text output---
         /// LogFormat - see instruction
         /// ---levels---
+        ///LogLevel - level at start
         ///LogAlwaysString
         ///LogFatalString
         ///LogErrorString
@@ -52,8 +53,10 @@ namespace SharpLogger
         /// ---time format---
         ///LogDateTimeFormat
         ///LogMilisecondsFormat
-        /// ---Char to put between multiple id---
+        /// ---Id formatting---
         ///LogIDSplitChar
+        ///LogIDBracketLeft
+        ///LogIDBracketRight
         ///---Writer selector---
         ///LogWriteTarget - can be File or Database
         /// ---File writer options---
@@ -87,6 +90,16 @@ namespace SharpLogger
                 options = new Options("", "Log");
             }
             LogDefaultOptions.AddDefaultOptions(options);
+            LogLevel.SetLevel(LogLevel.Always, options[LogDefaultOptions.AlwaysOption]);
+            LogLevel.SetLevel(LogLevel.Fatal,options[LogDefaultOptions.FatalOption]);
+            LogLevel.SetLevel(LogLevel.Error,options[LogDefaultOptions.ErrorOption]);
+            LogLevel.SetLevel(LogLevel.Warning,options[LogDefaultOptions.WarningOption]);
+            LogLevel.SetLevel(LogLevel.Info,options[LogDefaultOptions.InfoOption]);
+            LogLevel.SetLevel(LogLevel.Event,options[LogDefaultOptions.EventOption]);
+            LogLevel.SetLevel(LogLevel.Debug,options[LogDefaultOptions.DebugOption]);
+            LogLevel.SetLevel(LogLevel.All, options[LogDefaultOptions.AllOption]);
+            LogLevel.SetDefault(options["LogLevel"]);
+            
             if (collector != null)
             {
                 collector.ShutDown();

@@ -8,20 +8,6 @@ namespace SharpLogger
 {
     class BasicLogConstructor : ILogConstructor
     {
-        String[] levels;
-
-        public BasicLogConstructor(IOptions options)
-        {
-            levels = new string[LogLevel.Total];
-            levels[LogLevel.Always] = options[LogDefaultOptions.AlwaysOption];
-            levels[LogLevel.Fatal] = options[LogDefaultOptions.FatalOption];
-            levels[LogLevel.Error] = options[LogDefaultOptions.ErrorOption];
-            levels[LogLevel.Warning] = options[LogDefaultOptions.WarningOption];
-            levels[LogLevel.Info] = options[LogDefaultOptions.InfoOption];
-            levels[LogLevel.Event] = options[LogDefaultOptions.EventOption];
-            levels[LogLevel.Debug] = options[LogDefaultOptions.DebugOption];
-            levels[LogLevel.All] = options[LogDefaultOptions.AllOption];
-        }
 
         private void AppendIdString(StringBuilder sb, int[] ids)
         {
@@ -43,7 +29,7 @@ namespace SharpLogger
             sb.Append(' ');
             sb.Append(item.category);
             sb.Append(' ');
-            sb.Append(levels[item.level]);
+            sb.Append(LogLevel.GetLevel(item.level));
             sb.Append(' ');
             sb.Append(item.message);
             if (item.ex != null)
