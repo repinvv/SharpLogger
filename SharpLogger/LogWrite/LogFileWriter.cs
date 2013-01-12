@@ -29,7 +29,7 @@ namespace SharpLogger
                 flushTimeout = Timeout.Infinite;
             }
             forceFlush = TimeSpan.FromSeconds((double)flushTimeout / 500);
-            string dirname = options["WorkingDir"];
+            string dirname = options["LogBaseDir"];
             dirname.Replace('\\', '/');
             if (dirname!=string.Empty && dirname.Last() != '/')
             {
