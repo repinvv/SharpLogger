@@ -10,12 +10,19 @@ namespace SharpOptions
 {
     public class Options : IOptions
     {
-        private ConcurrentDictionary<string, string> options;
-        private OptionsReader optionsAccess;
+        private ConcurrentDictionary<string, string> options = new ConcurrentDictionary<string, string>();
+        private OptionsReader optionsReader;
+
+        /// <summary>
+        /// Empty options without reader
+        /// </summary>
+        public Options()
+        {
+            optionsReader = new OptionsNullReader();
+        }
 
         public Options(string path, string name, OptionsReaderType type = OptionsReaderType.Default)
         {
-            options = new ConcurrentDictionary<string, string>();
             if (type != OptionsReaderType.Database)
             {
                 if (string.IsNullOrEmpty(path))
@@ -26,15 +33,15 @@ namespace SharpOptions
                 if (path.Last() != '/')
                 {
                     path += '/';
-                }                
+                }
             }
-            optionsAccess = new OptionsReaderFactory().CreateOptionsReader(type, path, name);
+            optionsReader = new OptionsReaderFactory().CreateOptionsReader(type, path, name);
             ReadOptions();
         }
 
         void ReadOptions()
         {
-            var optionPairs = optionsAccess.ReadOptions();
+            var optionPairs = optionsReader.ReadOptions();
             foreach (var option in optionPairs)
                 options.
                    AddOrUpdate(option.Key, option.Value, (k, v) =>
@@ -78,7 +85,7 @@ namespace SharpOptions
 
         public void Save()
         {
-            optionsAccess.WriteOptions(options);
+            optionsReader.WriteOptions(options);
         }
 
         public string Get(string key, string defaultValue = null) //can't put string.empty here;
