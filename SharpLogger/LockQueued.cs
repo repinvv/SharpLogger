@@ -76,28 +76,37 @@ namespace SharpLogger
                 }
                 else
                 {
-                    if (queue.Count != 0)
+                    if (queue.Count > 0)
                     {
-                        if (queue.Count == 1)
+                        Queue<T> items = null;
+                        bool keepDequeue = true;
+                        while (keepDequeue)
                         {
                             lock (queSync)
                             {
-                                T item = queue.Dequeue();
-                                if (OnReceive != null)
+                                if (queue.Count > 10)
                                 {
-                                    OnReceive(item);
+                                    items = queue;
+                                    queue = new Queue<T>(); ;
+                                    keepDequeue = false;
+
+                                }
+                                else
+                                {
+                                    T item = queue.Dequeue();
+                                    if (OnReceive != null)
+                                    {
+                                        OnReceive(item);
+                                    }
+                                    if (queue.Count == 0)
+                                    {
+                                        keepDequeue = false;
+                                    }
                                 }
                             }
                         }
-                        else
+                        if (items != null)
                         {
-                            Queue<T> replacement = new Queue<T>();
-                            Queue<T> items;
-                            lock (queSync)
-                            {
-                                items = queue;
-                                queue = replacement;
-                            }
                             foreach (T t in items)
                             {
                                 if (OnReceive != null)
