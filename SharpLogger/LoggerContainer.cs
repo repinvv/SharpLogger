@@ -1,49 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SharpOptions;
+﻿using System.Collections.Generic;
+using SharpLogger.Loggers;
+
 namespace SharpLogger
 {
-    delegate InternalLogger LogCreate(string category);
+    delegate IInternalLogger LogCreate(string category);
 
     class LoggerContainer
     {
-        Dictionary<string, InternalLogger> loggers =
-            new Dictionary<string, InternalLogger>();
-        LogCreate logCreate;
+        Dictionary<string, IInternalLogger> _loggers =
+            new Dictionary<string, IInternalLogger>();
+        LogCreate _logCreate;
 
         public LoggerContainer(LogCreate logCreate)
         {
-            this.logCreate = logCreate;
+            _logCreate = logCreate;
         }
 
         public string DefaultCategory { set; private get; }
 
-        public InternalLogger GetLogger(string category)
+        public IInternalLogger GetLogger(string category)
         {
             if (string.IsNullOrEmpty(category))
             {
                 category = DefaultCategory;
             }
-            InternalLogger logger = null;
-            lock (loggers)
+            IInternalLogger logger;
+            lock (_loggers)
             {
-                if (loggers.TryGetValue(category, out logger))
+                if (_loggers.TryGetValue(category, out logger))
                 {
                     return logger;
                 }
-                logger = logCreate(category);
-                loggers.Add(category, logger);
+                logger = _logCreate(category);
+                _loggers.Add(category, logger);
             }
             return logger;
         }
 
         public void SetSender(Sender send)
         {
-            lock (loggers)
+            lock (_loggers)
             {
-                foreach (var pair in loggers)
+                foreach (var pair in _loggers)
                 {
                     pair.Value.SetSender(send);
                 }
@@ -52,10 +50,10 @@ namespace SharpLogger
 
         public void SetLevel(string category, int level)
         {
-            InternalLogger logger;
-            lock (loggers)
+            lock (_loggers)
             {
-                if (loggers.TryGetValue(category, out logger))
+                IInternalLogger logger;
+                if (_loggers.TryGetValue(category, out logger))
                 {
                     logger.SetLevel(level);
                 }
@@ -64,10 +62,10 @@ namespace SharpLogger
 
         public void SetOneLevel(string category, int level, bool value)
         {
-            InternalLogger logger;
-            lock (loggers)
+            lock (_loggers)
             {
-                if (loggers.TryGetValue(category, out logger))
+                IInternalLogger logger;
+                if (_loggers.TryGetValue(category, out logger))
                 {
                     logger[level] = value;
                 }
@@ -76,9 +74,9 @@ namespace SharpLogger
 
         public void SetLevelForAll(int level)
         {
-            lock (loggers)
+            lock (_loggers)
             {
-                foreach (var pair in loggers)
+                foreach (var pair in _loggers)
                 {
                     pair.Value.SetLevel(level);
                 }
@@ -87,9 +85,9 @@ namespace SharpLogger
 
         public void SetOneLevelForAll(int level, bool value)
         {
-            lock (loggers)
+            lock (_loggers)
             {
-                foreach (var x in loggers)
+                foreach (var x in _loggers)
                 {
                     x.Value[level] = value;
                 }

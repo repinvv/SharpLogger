@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SharpLogger;
+using SharpLogger.Loggers;
 
 namespace LoggerTest
 {
-   class LoggerMock : InternalLogger
+   class LoggerMock : IInternalLogger
    {
       public bool levelValue = false;
       public int level;

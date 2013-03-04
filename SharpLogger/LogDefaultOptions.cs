@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SharpOptions;
+﻿using SharpOptions;
 
 namespace SharpLogger
 {
-    class LogDefaultOptions
+    static class LogDefaultOptions
     {
         public static void AddDefaultOptions(IOptions options)
         {

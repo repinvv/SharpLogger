@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using SharpOptions;
 
-namespace SharpLogger
+namespace SharpLogger.LogConstruction
 {
     class LogConstructorFactory
     {
-        IOptions options;
-        ConfigurableLogConstructor first, current;
-        StringBuilder buffer = new StringBuilder(), sb;
+        IOptions _options;
+        ConfigurableLogConstructor _constructor;
+        StringBuilder _buffer = new StringBuilder();
 
         public LogConstructorFactory(IOptions options)
         {
-            this.options = options;
+            _options = options;
         }
 
         void Escaped(char val)
@@ -23,71 +20,66 @@ namespace SharpLogger
             {
                 case 'd':
                     AddConstructor(
-                       new CLCDateTimeAppender(
-                          options["LogDateTimeFormat"],
-                          options["LogMilisecondsFormat"]));
+                       new DateTimeAppender(
+                          _options["LogDateTimeFormat"],
+                          _options["LogMilisecondsFormat"]));
                     break;
                 case 'l':
-                    AddConstructor(new CLCLevelAppender());
+                    AddConstructor(new LevelAppender());
                     break;
                 case 'i':
                     AddConstructor(
-                        new CLCIdAppender(options["LogIDSplitChar"]
-                            , options["LogIDBracketLeft"]
-                            , options["LogIDBracketRight"]));
+                        new IDAppender(_options["LogIDSplitChar"]
+                            , _options["LogIDBracketLeft"]
+                            , _options["LogIDBracketRight"]));
                     break;
                 case 'c':
-                    AddConstructor(new CLCCategoryAppender());
+                    AddConstructor(new CategoryAppender());
                     break;
                 case 'm':
-                    AddConstructor(new CLCMessageAppender());
+                    AddConstructor(new MessageAppender());
                     break;
                 case 'e':
-                    AddConstructor(new CLCExceptionAppender());
+                    AddConstructor(new ExceptionAppender());
                     break;
                 case 't':
-                    AddConstructor(new CLCStackTraceAppender());
+                    AddConstructor(new StackTraceExceptionAppender());
                     break;
                 case 'r':
-                    buffer.Append('\r');
+                    _buffer.Append('\r');
                     break;
                 case 'n':
-                    buffer.Append('\n');
+                    _buffer.Append('\n');
                     break;
                 default:
-                    buffer.Append(val);
+                    _buffer.Append(val);
                     break;
             }
         }
 
-        void AddConstructor(ConfigurableLogConstructor constructor)
+        void AddStringAppender()
         {
-            if (buffer.Length > 0)
+            if (_buffer.Length > 0)
             {
-                var output = buffer.ToString();
-                buffer.Clear();
-                AddConstructor(new CLCStringAppender(output));
+                var output = _buffer.ToString();
+                _buffer.Clear();
+                _constructor.Add(new StringAppender(output));
             }
-            if (first == null)
-            {
-                first = constructor;
-                current = constructor;
-            }
-            else
-            {
-                current.Chain(constructor);
-                current = constructor;
-            }
+        }
+
+        void AddConstructor(ILogConstructor constructor)
+        {
+            AddStringAppender();
+            _constructor.Add(constructor);
         }
 
         public ILogConstructor GetLogConstructor()
         {
-            string messageFormat = options["LogMessageFormat"];
+            string messageFormat = _options["LogMessageFormat"];
             if (messageFormat == "basic" || messageFormat.Length < 5)
                 return new BasicLogConstructor();
-            first = null;
-            sb = new StringBuilder();
-            buffer.Clear();
+            _constructor = new ConfigurableLogConstructor();
+            _buffer.Clear();
             for (int n = 0; n < messageFormat.Length; n++)
             {
                 if (n < messageFormat.Length - 1 && messageFormat[n] == '\\')
@@ -97,12 +89,12 @@ namespace SharpLogger
                 }
                 else
                 {
-                    buffer.Append(messageFormat[n]);
+                    _buffer.Append(messageFormat[n]);
                 }
             }
-            AddConstructor(new CLCResultReturner());
-            sb = null;
-            return first;
+            AddStringAppender();
+            _constructor.Finished();
+            return _constructor;
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace SharpLogger
 {
-    public delegate void ReceiveHandler<T>(T item);
+    public delegate void ReceiveHandler<in T>(T item);
 
     public interface IQueued<T>
     {

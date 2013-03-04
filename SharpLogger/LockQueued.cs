@@ -1,70 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace SharpLogger
 {
     class LockQueued<T> : IQueued<T>
     {
-        bool active = false;
-        int timeout = Timeout.Infinite;
-        Queue<T> queue = new Queue<T>();
-        object queSync = new object();
-        EventWaitHandle[] events = new EventWaitHandle[2];
+        bool _active;
+        int _timeout = Timeout.Infinite;
+        Queue<T> _queue = new Queue<T>();
+        object _queSync = new object();
+        WaitHandle[] _events = new WaitHandle[2];
+        private AutoResetEvent _sendEvent;
 
         public event ReceiveHandler<T> OnReceive;
         public event Action OnTimeout;
 
         public LockQueued(IThreadStarter starter, ManualResetEvent terminateEvent = null)
         {
-            events[0] = new AutoResetEvent(false);
-            events[1] = terminateEvent ?? new ManualResetEvent(false);
+            _events[0] = _sendEvent = new AutoResetEvent(false);
+            _events[1] = terminateEvent ?? new ManualResetEvent(false);
             starter.Start(ThreadRun);
         }
 
         public bool Active
         {
-            get { return active; }
+            get { return _active; }
         }
 
         public void SetTimeout(int timeout)
         {
-            this.timeout = timeout;
+            _timeout = timeout;
         }
 
         public void Send(T msg)
         {
-            if (!active)
+            if (!_active)
             {
                 return;
             }
             try
             {
-                lock (queSync)
+                lock (_queSync)
                 {
-                    queue.Enqueue(msg);
+                    _queue.Enqueue(msg);
                 }
             }
             catch (Exception)
             {
                 //fail silently
             }
-            events[0].Set();
+            _sendEvent.Set();
         }
 
         public void Terminate()
         {
-            events[1].Set();
+            ((EventWaitHandle)_events[1]).Set();
         }
 
         void ThreadRun()
         {
             int index;
             int currentTimeout = Timeout.Infinite;
-            active = true;
-            while ((index = WaitHandle.WaitAny(events, currentTimeout)) != 1)
+            _active = true;
+            while ((index = WaitHandle.WaitAny(_events, currentTimeout)) != 1)
             {
                 if (index == WaitHandle.WaitTimeout)
                 {
@@ -76,29 +75,29 @@ namespace SharpLogger
                 }
                 else
                 {
-                    if (queue.Count > 0)
+                    if (_queue.Count > 0)
                     {
                         Queue<T> items = null;
                         bool keepDequeue = true;
                         while (keepDequeue)
                         {
-                            lock (queSync)
+                            lock (_queSync)
                             {
-                                if (queue.Count > 10)
+                                if (_queue.Count > 10)
                                 {
-                                    items = queue;
-                                    queue = new Queue<T>(); ;
+                                    items = _queue;
+                                    _queue = new Queue<T>();
                                     keepDequeue = false;
 
                                 }
                                 else
                                 {
-                                    T item = queue.Dequeue();
+                                    T item = _queue.Dequeue();
                                     if (OnReceive != null)
                                     {
                                         OnReceive(item);
                                     }
-                                    if (queue.Count == 0)
+                                    if (_queue.Count == 0)
                                     {
                                         keepDequeue = false;
                                     }
@@ -116,15 +115,15 @@ namespace SharpLogger
                             }
                         }
                     }
-                    currentTimeout = timeout;
+                    currentTimeout = _timeout;
                 }
 
             }
             //terminated
-            active = false;
-            lock (queSync)
+            _active = false;
+            lock (_queSync)
             {
-                queue.Clear();
+                _queue.Clear();
             }
         }
     }

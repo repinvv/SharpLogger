@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace SharpLogger
+namespace SharpLogger.Loggers
 {
     delegate void Sender(LogItem message);
 
-    class RegularLogger : InternalLogger
+    class RegularLogger : IInternalLogger
     {
-        Sender[] senders = new Sender[LogLevel.Total];
-        string category;
+        Sender[] _senders = new Sender[LogLevel.Total];
+        string _category;
 
         private void NullSend(LogItem message)
         {
@@ -18,9 +15,9 @@ namespace SharpLogger
 
         public RegularLogger(string category, Sender sender, int level)
         {
-            this.category = category;
-            senders[0] = NullSend;
-            senders[1] = sender ?? NullSend;
+            _category = category;
+            _senders[0] = NullSend;
+            _senders[1] = sender ?? NullSend;
             SetLevel(level);
         }
 
@@ -29,9 +26,9 @@ namespace SharpLogger
             for (int n = LogLevel.Fatal; n < LogLevel.Total; n++)
             {
                 if (n > level)
-                    senders[n] = NullSend;
+                    _senders[n] = NullSend;
                 else
-                    senders[n] = senders[1];
+                    _senders[n] = _senders[1];
             }
         }
 
@@ -39,9 +36,9 @@ namespace SharpLogger
         {
             for (int n = 0; n < LogLevel.Total; n++)
             {
-                if (senders[n] != NullSend)
+                if (_senders[n] != NullSend)
                 {
-                    senders[n] = sender ?? NullSend;
+                    _senders[n] = sender ?? NullSend;
                 }
             }
         }
@@ -54,11 +51,11 @@ namespace SharpLogger
                 {
                     if (value)
                     {
-                        senders[level] = senders[LogLevel.Always];
+                        _senders[level] = _senders[LogLevel.Always];
                     }
                     else
                     {
-                        senders[level] = NullSend;
+                        _senders[level] = NullSend;
                     }
 
                 }
@@ -67,72 +64,72 @@ namespace SharpLogger
 
         public void Always(string message)
         {
-            senders[LogLevel.Always](new LogItem(category, LogLevel.Always, message));
+            _senders[LogLevel.Always](new LogItem(_category, LogLevel.Always, message));
         }
 
         public void Fatal(string message, Exception ex = null)
         {
-            senders[LogLevel.Fatal](new LogItem(category, LogLevel.Fatal, message, ex: ex));
+            _senders[LogLevel.Fatal](new LogItem(_category, LogLevel.Fatal, message, ex: ex));
         }
 
         public void Error(string message, Exception ex = null)
         {
-            senders[LogLevel.Error](new LogItem(category, LogLevel.Error, message, ex: ex));
+            _senders[LogLevel.Error](new LogItem(_category, LogLevel.Error, message, ex: ex));
         }
 
         public void Warning(string message, int id = 0, Exception ex = null)
         {
-            senders[LogLevel.Warning](new LogItem(category, LogLevel.Warning, message, id, ex));
+            _senders[LogLevel.Warning](new LogItem(_category, LogLevel.Warning, message, id, ex));
         }
 
         public void Warning(string message, int[] id, Exception ex = null)
         {
-            senders[LogLevel.Warning](new LogItem(category, LogLevel.Warning, message, id, ex));
+            _senders[LogLevel.Warning](new LogItem(_category, LogLevel.Warning, message, id, ex));
         }
 
         public void Warning(string message, Exception ex)
         {
-            senders[LogLevel.Warning](new LogItem(category, LogLevel.Warning, message, ex: ex));
+            _senders[LogLevel.Warning](new LogItem(_category, LogLevel.Warning, message, ex: ex));
         }
 
         public void Info(string message, int id = 0)
         {
-            senders[LogLevel.Info](new LogItem(category, LogLevel.Info, message, id));
+            _senders[LogLevel.Info](new LogItem(_category, LogLevel.Info, message, id));
         }
 
         public void Info(string message, int[] id)
         {
-            senders[LogLevel.Info](new LogItem(category, LogLevel.Info, message, id));
+            _senders[LogLevel.Info](new LogItem(_category, LogLevel.Info, message, id));
         }
 
         public void Event(string message, int id = 0)
         {
-            senders[LogLevel.Event](new LogItem(category, LogLevel.Event, message, id));
+            _senders[LogLevel.Event](new LogItem(_category, LogLevel.Event, message, id));
         }
 
         public void Event(string message, int[] id)
         {
-            senders[LogLevel.Event](new LogItem(category, LogLevel.Event, message, id));
+            _senders[LogLevel.Event](new LogItem(_category, LogLevel.Event, message, id));
         }
 
         public void Debug(string message, int id = 0)
         {
-            senders[LogLevel.Debug](new LogItem(category, LogLevel.Debug, message, id));
+            _senders[LogLevel.Debug](new LogItem(_category, LogLevel.Debug, message, id));
         }
 
         public void Debug(string message, int[] id)
         {
-            senders[LogLevel.Debug](new LogItem(category, LogLevel.Debug, message, id));
+            _senders[LogLevel.Debug](new LogItem(_category, LogLevel.Debug, message, id));
         }
 
         public void Detailed(string message, int id = 0)
         {
-            senders[LogLevel.All](new LogItem(category, LogLevel.All, message, id));
+            _senders[LogLevel.All](new LogItem(_category, LogLevel.All, message, id));
         }
 
         public void Detailed(string message, int[] id)
         {
-            senders[LogLevel.All](new LogItem(category, LogLevel.All, message, id));
+            _senders[LogLevel.All](new LogItem(_category, LogLevel.All, message, id));
         }
     }
 }

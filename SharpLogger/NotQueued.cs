@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Timers;
 
 namespace SharpLogger
@@ -12,19 +9,19 @@ namespace SharpLogger
 
         public event Action OnTimeout;
 
-        Timer timer = new Timer(500);
+        Timer _timer = new Timer(500);
 
         public NotQueued()
         {
-            timer.Elapsed += OnTimedEvent;
+            _timer.Elapsed += OnTimedEvent;
         }
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-            lock (timer)
+            lock (_timer)
             {
                 OnTimeout();
-                timer.Stop();
+                _timer.Stop();
             }
         }
 
@@ -35,16 +32,16 @@ namespace SharpLogger
 
         public void SetTimeout(int timeout)
         {
-            timer.Interval = timeout;
+            _timer.Interval = timeout;
         }
 
         public void Send(LogItem msg)
         {
-            lock (timer)
+            lock (_timer)
             {
                 OnReceive(msg);
-                timer.Stop();
-                timer.Start();
+                _timer.Stop();
+                _timer.Start();
             }
         }
 

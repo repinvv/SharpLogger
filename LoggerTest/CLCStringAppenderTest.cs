@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Text;
+using SharpLogger.LogConstruction;
 
 namespace LoggerTest
 {
@@ -19,9 +20,7 @@ namespace LoggerTest
 
       internal override ILogConstructor CreateLogConstructor()
       {
-         var item = new CLCStringAppender(staticString);
-         item.Chain(new CLCResultReturner());
-         return item;
+         return new StringAppender(staticString);
       }
 
       internal override bool stringCriteria(string constructed)

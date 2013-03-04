@@ -1,6 +1,7 @@
 ﻿using SharpLogger;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using SharpLogger.LogWrite;
 using SharpOptions;
 
 namespace LoggerTest

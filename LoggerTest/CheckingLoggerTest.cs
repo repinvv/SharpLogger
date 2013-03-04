@@ -1,6 +1,7 @@
 ﻿using SharpLogger;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using SharpLogger.Loggers;
 
 namespace LoggerTest
 {
@@ -52,7 +53,7 @@ namespace LoggerTest
 
 
 
-      internal override InternalLogger CreateLogger()
+      internal override IInternalLogger CreateLogger()
       {
          return new CheckingLogger(category, Send, LogLevel.Default);
       }

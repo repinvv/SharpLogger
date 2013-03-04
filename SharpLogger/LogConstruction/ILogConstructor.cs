@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
-namespace SharpLogger
+namespace SharpLogger.LogConstruction
 {
     interface ILogConstructor
     {

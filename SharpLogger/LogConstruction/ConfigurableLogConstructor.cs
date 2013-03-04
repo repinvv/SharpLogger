@@ -1,19 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
 
-namespace SharpLogger
+namespace SharpLogger.LogConstruction
 {
-    abstract class ConfigurableLogConstructor : ILogConstructor
+    class ConfigurableLogConstructor : ILogConstructor
     {
-        protected ConfigurableLogConstructor next;
+        private List<ILogConstructor> _constructList = new List<ILogConstructor>();
 
-        public void Chain(ConfigurableLogConstructor next)
+        ILogConstructor[] _constructors = new ILogConstructor[0];
+
+        public void Add(ILogConstructor next)
         {
-            this.next = next;
+            _constructList.Add(next);
         }
 
-        public abstract void ConstructLine(StringBuilder sb, LogItem item);
+        public void Finished()
+        {
+            _constructors = _constructList.ToArray();
+        }
+
+        public void ConstructLine(StringBuilder sb, LogItem item)
+        {
+            foreach (var logConstructor in _constructors)
+            {
+                logConstructor.ConstructLine(sb, item);
+            }
+        }
     }
 }

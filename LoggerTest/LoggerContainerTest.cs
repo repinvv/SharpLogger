@@ -4,6 +4,7 @@ using System;
 using Autofac;
 using Moq;
 using System.Threading;
+using SharpLogger.Loggers;
 
 namespace LoggerTest
 {
@@ -28,7 +29,7 @@ namespace LoggerTest
 
          builder
             .RegisterType<LoggerMock>()
-            .As<InternalLogger>();
+            .As<IInternalLogger>();
 
          testContainer = builder.Build();
       }

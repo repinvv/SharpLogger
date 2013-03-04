@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Text;
+using SharpLogger.LogConstruction;
 
 namespace LoggerTest
 {
@@ -17,9 +18,7 @@ namespace LoggerTest
 
       internal override ILogConstructor CreateLogConstructor()
       {
-         var item = new CLCDateTimeAppender("dd-MM-yyyy HH.mm.ss", ":{0:000}");
-         item.Chain(new CLCResultReturner());
-         return item;
+         return new DateTimeAppender("dd-MM-yyyy HH.mm.ss", ":{0:000}");
       }
 
       internal override bool stringCriteria(string constructed)

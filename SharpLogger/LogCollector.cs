@@ -2,23 +2,23 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using SharpLogger.LogWrite;
 
 namespace SharpLogger
 {
     class LogCollector
     {
-        IQueued<LogItem> qThread;
-        HashSet<int> filter;
-        ConcurrentQueue<Action<HashSet<int>>> filterQue;
-        ILogWriter writer;
+        IQueued<LogItem> _qThread;
+        HashSet<int> _filter;
+        ConcurrentQueue<Action<HashSet<int>>> _filterQue;
+        ILogWriter _writer;
 
         public LogCollector(IQueued<LogItem> qThread, ILogWriter writer)
         {
-            this.writer = writer;
-            filterQue = new ConcurrentQueue<Action<HashSet<int>>>();
-            filter = new HashSet<int>();
-            this.qThread = qThread;
+            _writer = writer;
+            _filterQue = new ConcurrentQueue<Action<HashSet<int>>>();
+            _filter = new HashSet<int>();
+            _qThread = qThread;
             qThread.SetTimeout(writer.GetTimeout());
             qThread.OnReceive += Receive;
             qThread.OnTimeout += TimeOut;
@@ -26,71 +26,62 @@ namespace SharpLogger
 
         public void Send(LogItem message)
         {
-            qThread.Send(message);
+            _qThread.Send(message);
         }
 
         void RefreshIds()
         {
-            Action<HashSet<int>> refresh;
-            while (!filterQue.IsEmpty)
+            while (!_filterQue.IsEmpty)
             {
-                if (filterQue.TryDequeue(out refresh) && refresh != null)
+                Action<HashSet<int>> refresh;
+                if (_filterQue.TryDequeue(out refresh) && refresh != null)
                 {
-                    refresh(filter);
+                    refresh(_filter);
                 }
             }
         }
 
-        bool CheckIds(int[] ids)
+        bool CheckIds(IEnumerable<int> ids)
         {
-            if (!filterQue.IsEmpty)
+            if (!_filterQue.IsEmpty)
             {
                 RefreshIds();
             }
-            return (filter.Count == 0
-               || ids.FirstOrDefault(x => filter.Contains(x)) != default(int));
+            return (_filter.Count == 0
+               || ids.FirstOrDefault(x => _filter.Contains(x)) != default(int));
         }
 
         void Receive(LogItem message)
         {
-            if (message.level <= LogLevel.Error || CheckIds(message.ids))
+            if (message.Level <= LogLevel.Error || CheckIds(message.Ids))
             {
-                writer.Write(message);
+                _writer.Write(message);
             }
         }
 
         void TimeOut()
         {
-            writer.Flush();
+            _writer.Flush();
         }
 
         public void ShutDown()
         {
-            qThread.Terminate();
+            _qThread.Terminate();
         }
 
         public void FilterAddID(int id)
         {
-            filterQue.Enqueue((x) =>
-            {
-                x.Add(id);
-            });
+            _filterQue.Enqueue(x => x.Add(id));
         }
 
         public void FilterRemoveID(int id)
         {
-            filterQue.Enqueue((x) =>
-            {
-                x.Remove(id);
-            });
+            _filterQue.Enqueue(x => x.Remove(id));
         }
 
         public void FilterClear()
         {
-            filterQue.Enqueue((x) =>
-            {
-                x.Clear();
-            });
+            _filterQue.Enqueue(x => x.Clear());
         }
     }
 }

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace SharpLogger
+namespace SharpLogger.Loggers
 {
-    public class NullLogger : Logger
+    public class NullLogger : ILogger
     {
 
         public void Always(string message)

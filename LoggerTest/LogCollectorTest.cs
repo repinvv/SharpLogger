@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using Moq;
+using SharpLogger.LogWrite;
 
 namespace LoggerTest
 {

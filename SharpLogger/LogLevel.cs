@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace SharpLogger
+﻿namespace SharpLogger
 {
-    public class LogLevel
+    public static class LogLevel
     {
         public const int Invalid = 0;
         public const int Always = 1;
@@ -18,13 +13,13 @@ namespace SharpLogger
         public const int All = 8;
         public const int Total = 9;
         private static int _default = Info;
-        private static string[] levels = new string[Total];
+        private static string[] _levels = new string[Total];
 
-        internal static void SetLevel(int level, string LevelString)
+        internal static void SetLevel(int level, string levelString)
         {
             if (isLevelValid(level))
             {
-                levels[level] = LevelString;
+                _levels[level] = levelString;
             }
         }
 
@@ -32,16 +27,16 @@ namespace SharpLogger
         {
             if (isLevelValid(level))
             {
-                return levels[level];
+                return _levels[level];
             }
-            return levels[_default];
+            return _levels[_default];
         }
 
         internal static void SetDefault(string levelString)
         {
-            for (int n = 0; n < levels.Length; n++)
+            for (int n = 0; n < _levels.Length; n++)
             {
-                if (levels[n] == levelString)
+                if (_levels[n] == levelString)
                 {
                     _default = n;
                     return;

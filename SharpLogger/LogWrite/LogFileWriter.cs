@@ -1,68 +1,52 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
+using SharpLogger.LogConstruction;
 using SharpOptions;
 using System.IO;
 
-namespace SharpLogger
+namespace SharpLogger.LogWrite
 {
     class LogFileWriter : ILogWriter
     {
-        const int bufferSize = 2000000;
+        const int BufferSize = 2000000;
 
-        TimeSpan forceFlush;
-        int flushTimeout;
-        int rotationSize;
-        String[] fileName;
-        StringBuilder buffer;
-        DateTime lastFlush;
-        ILogConstructor constructor;
+        TimeSpan _forceFlush;
+        int _flushTimeout;
+        int _rotationSize;
+        private string _filename;
+        private int _rotationFiles;
+        StringBuilder _buffer;
+        DateTime _lastFlush;
+        ILogConstructor _constructor;
 
         public LogFileWriter(ILogConstructor constructor, IOptions options)
         {
-            this.constructor = constructor;
-            flushTimeout = options.GetInt("LogFileFlush", Timeout.Infinite);
-            if (flushTimeout == 0)
+            _constructor = constructor;
+            _flushTimeout = options.GetInt("LogFileFlush", Timeout.Infinite);
+            if (_flushTimeout == 0)
             {
-                flushTimeout = Timeout.Infinite;
+                _flushTimeout = Timeout.Infinite;
             }
-            forceFlush = TimeSpan.FromSeconds((double)flushTimeout / 500);
-            string dirname = options["LogBaseDir"];
-            dirname.Replace('\\', '/');
-            if (dirname!=string.Empty && dirname.Last() != '/')
+            _forceFlush = TimeSpan.FromSeconds((double)_flushTimeout / 500);
+            _filename = options.Get("LogFilename", "./logs.log");
+            _rotationSize = (1 << 20) * options.GetInt("LogRotationSizeMb", 5);
+            _rotationFiles = options.GetInt("LogRotationFiles", 5);
+            var append = options["LogFileAppend"].ToLower() == "true";
+            if (!append && File.Exists(_filename))
             {
-                dirname += "/logs/";
+                Rotate();
             }
-            else
-            {
-                dirname += "logs/";
-            }
-            Directory.CreateDirectory(dirname);
-            rotationSize = (1 << 20) * options.GetInt("LogRotationSizeMb", 5);
-            fileName = new string[options.GetInt("LogRotationFiles", 5)];
-            fileName[0] = dirname + "latest.log";
-            for (int n = 1; n < fileName.Length; n++)
-                fileName[n] = dirname + "old" + n + ".log";
-            bool append = options["LogFileAppend"].ToLower() == "true";
-            if (!append)
-            {
-                if (File.Exists(fileName[0]))
-                {
-                    Rotate();
-                }
-            }
-            buffer = new StringBuilder(bufferSize);
-            lastFlush = DateTime.Now;
+            _buffer = new StringBuilder(BufferSize + 256);
+            _lastFlush = DateTime.Now;
         }
 
         public void Write(LogItem message)
         {
-            TimeSpan elapsed = (DateTime.Now - lastFlush);
-            constructor.ConstructLine(buffer, message);
-            if (buffer.Length >= bufferSize
-               || elapsed > forceFlush)
+            TimeSpan elapsed = (DateTime.Now - _lastFlush);
+            _constructor.ConstructLine(_buffer, message);
+            if (_buffer.Length >= BufferSize
+               || elapsed > _forceFlush)
             {
                 Flush();
             }
@@ -70,60 +54,39 @@ namespace SharpLogger
 
         public void Flush()
         {
-            lastFlush = DateTime.Now;
-            var output = buffer.ToString();
-            buffer.Clear();
-            var outputBytes = UTF8Encoding.UTF8.GetBytes(output);
-            var file = FileOpen();
-            if (file == null)
+            _lastFlush = DateTime.Now;
+            var output = _buffer.ToString();
+            _buffer.Clear();
+            var outputBytes = Encoding.UTF8.GetBytes(output);
+            if (File.Exists(_filename))
             {
-                return;
-            }
-            if (file.Length + outputBytes.Length > rotationSize)
-            {
-                file.Close();
-                file.Dispose();
-                Rotate();
-                file = FileOpen();
-            }
-            if (file == null)
-            {
-                return;
-            }
-            file.Write(outputBytes, 0, outputBytes.Length);
-            file.Close();
-            file.Dispose();
-        }
-
-        FileStream FileOpen()
-        {
-            try
-            {
-                if (File.Exists(fileName[0]))
+                var fi = new FileInfo(_filename);
+                if (fi.Length + outputBytes.Length > _rotationSize)
                 {
-                    return new FileStream(fileName[0], FileMode.Append, FileAccess.Write, FileShare.Read);
+                    Rotate();
                 }
-                var fileStream = new FileStream(fileName[0], FileMode.Create, FileAccess.Write, FileShare.Read);
-                var preamble = UTF8Encoding.UTF8.GetPreamble();
-                fileStream.Write(preamble, 0, preamble.Length);
-                return fileStream;
             }
-            catch (Exception)
-            {
-                //fail silently
-            }
-            return null;
+            File.AppendAllText(_filename, output);
         }
 
         void Rotate()
         {
             try
             {
-                if (File.Exists(fileName.Last()))
-                    File.Delete(fileName.Last());
-                for (int n = fileName.Length - 2; n >= 0; n--)
-                    if (File.Exists(fileName[n]))
-                        File.Move(fileName[n], fileName[n + 1]);
+                string name1 = _filename + "." + _rotationFiles;
+                if (File.Exists(name1))
+                {
+                    File.Delete(name1);
+                }
+                for (int n = _rotationFiles - 1; n > 0; n--)
+                {
+                    string name2 = _filename + "." + n;
+                    if (File.Exists(name2))
+                    {
+                        File.Move(name2, name1);
+                    }
+                    name1 = name2;
+                }
             }
             catch (Exception)
             {
@@ -133,7 +96,7 @@ namespace SharpLogger
 
         public int GetTimeout()
         {
-            return flushTimeout;
+            return _flushTimeout;
         }
     }
 }

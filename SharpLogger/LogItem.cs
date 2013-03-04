@@ -1,37 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SharpLogger
 {
     class LogItem
     {
-        public readonly DateTime time;
-        public readonly String category;
-        public readonly int level;
-        public readonly int[] ids;
-        public readonly String message;
-        public readonly Exception ex;        
+        public readonly DateTime Time;
+        public readonly String Category;
+        public readonly int Level;
+        public readonly int[] Ids;
+        public readonly String Message;
+        public readonly Exception Ex;        
 
         public LogItem(String category, int level, String message, int id = 0, Exception ex = null)
         {
-            time = DateTime.Now;
-            this.category = category;
-            this.level = LogLevel.isLevelValid(level) ? level : LogLevel.Debug;
-            this.message = message;
-            this.ids = new int[] { id };
-            this.ex = ex;
+            Time = DateTime.Now;
+            Category = category;
+            Level = LogLevel.isLevelValid(level) ? level : LogLevel.Debug;
+            Message = message;
+            Ids = new int[] { id };
+            Ex = ex;
         }
 
         public LogItem(String category, int level, String message, int[] ids, Exception ex = null)
         {
-            time = DateTime.Now;
-            this.category = category;
-            this.level = LogLevel.isLevelValid(level) ? level : LogLevel.Debug;
-            this.message = message;
-            this.ids = ids;
-            this.ex = ex;
+            Time = DateTime.Now;
+            Category = category;
+            Level = LogLevel.isLevelValid(level) ? level : LogLevel.Debug;
+            Message = message;
+            Ids = ids;
+            Ex = ex;
         }
 
     }

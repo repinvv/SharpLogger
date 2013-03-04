@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace SharpLogger
+﻿namespace SharpLogger.Loggers
 {
-    interface InternalLogger : Logger
+    interface IInternalLogger : ILogger
     {
         void SetLevel(int level);
         void SetSender(Sender sender);

@@ -125,8 +125,9 @@ namespace ManualTest
 
             Console.WriteLine("Nlog test");
             Console.WriteLine("Elapsed {0} miliseconds\n", runThreads(NlogFlood));
+            Console.ReadKey();
          }
-         Console.ReadKey();
+         
       }
    }
 

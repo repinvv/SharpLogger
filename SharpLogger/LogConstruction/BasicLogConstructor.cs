@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using SharpOptions;
 
-namespace SharpLogger
+namespace SharpLogger.LogConstruction
 {
     class BasicLogConstructor : ILogConstructor
     {
-
         private void AppendIdString(StringBuilder sb, int[] ids)
         {
             foreach (int id in ids)
@@ -23,20 +19,20 @@ namespace SharpLogger
         public void ConstructLine(StringBuilder sb, LogItem item)
         {
             sb.Clear();
-            sb.Append(item.time.ToString("dd-MM-yyyy HH.mm.ss"));
-            sb.Append(String.Format(":{0:000} ", item.time.Millisecond));
-            AppendIdString(sb, item.ids);
+            sb.Append(item.Time.ToString("dd-MM-yyyy HH.mm.ss"));
+            sb.Append(String.Format(":{0:000} ", item.Time.Millisecond));
+            AppendIdString(sb, item.Ids);
             sb.Append(' ');
-            sb.Append(item.category);
+            sb.Append(item.Category);
             sb.Append(' ');
-            sb.Append(LogLevel.GetLevel(item.level));
+            sb.Append(LogLevel.GetLevel(item.Level));
             sb.Append(' ');
-            sb.Append(item.message);
-            if (item.ex != null)
+            sb.Append(item.Message);
+            if (item.Ex != null)
             {
                 sb.Append('\n');
-                sb.Append(item.ex.Message);
-                sb.Append(item.ex.StackTrace);
+                sb.Append(item.Ex.Message);
+                sb.Append(item.Ex.StackTrace);
             }
             sb.Append('\n');
         }
