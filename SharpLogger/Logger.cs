@@ -2,7 +2,7 @@ using System;
 
 namespace SharpLogger
 {
-    public interface ILogger
+    public interface Logger
     {
         /// <summary>
         /// Message prints always, regardless of filtering rules.

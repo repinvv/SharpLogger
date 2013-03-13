@@ -2,7 +2,7 @@
 
 namespace SharpLogger.Loggers
 {
-    public class NullLogger : ILogger
+    public class NullLogger : Logger
     {
 
         public void Always(string message)

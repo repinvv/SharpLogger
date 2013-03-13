@@ -5,23 +5,23 @@ namespace SharpLogger
 {
     class PoolThreadStarter : IThreadStarter
     {
-        Action<object> _action;
+        Action<object> action;
 
         public void Start(Action threadRun)
         {
-            _action = x => threadRun();
+            action = x => threadRun();
             ThreadPool.QueueUserWorkItem(ActionStart);
         }
 
         public void Start(Action<object> threadRun, object argument)
         {
-            _action = threadRun;
+            action = threadRun;
             ThreadPool.QueueUserWorkItem(ActionStart);
         }
 
         void ActionStart(object argument)
         {
-            _action(argument);
+            action(argument);
         }
 
     }

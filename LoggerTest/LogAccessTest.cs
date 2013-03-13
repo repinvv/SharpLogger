@@ -70,7 +70,7 @@ namespace LoggerTest
       {
          string Category1 = "Some cat";
          string Category2 = "Another cat";
-         ILogger first, second, third, nullLog;
+         Logger first, second, third, nullLog;
          first = LogAccess.GetLogger(Category1);
          second = LogAccess.GetLogger(Category2);
          third = LogAccess.GetLogger(Category1);
@@ -90,7 +90,7 @@ namespace LoggerTest
       [TestMethod()]
       public void GetNullLoggerTest()
       {
-         ILogger first, second;
+         Logger first, second;
          first = LogAccess.GetNullLogger();
          second = LogAccess.GetNullLogger();
          Assert.IsNotNull(first);
@@ -99,7 +99,7 @@ namespace LoggerTest
          TryLogger(first);
       }
 
-      void TryLogger(ILogger logger)
+      void TryLogger(Logger logger)
       {
          bool thrown = false;
          string message = "msg";

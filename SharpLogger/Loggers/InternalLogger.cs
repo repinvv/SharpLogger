@@ -1,6 +1,6 @@
 ﻿namespace SharpLogger.Loggers
 {
-    interface IInternalLogger : ILogger
+    interface IInternalLogger : Logger
     {
         void SetLevel(int level);
         void SetSender(Sender sender);

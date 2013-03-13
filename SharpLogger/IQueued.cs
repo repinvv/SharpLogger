@@ -9,7 +9,7 @@ namespace SharpLogger
         event ReceiveHandler<T> OnReceive;
         event Action OnTimeout;
         bool Active { get; }
-        void SetTimeout(int timeout);
+        void SetTimeout(int value);
         void Send(T msg);
         void Terminate();
     }

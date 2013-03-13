@@ -35,20 +35,20 @@ insert into {0} values {1};";
 @"
 delete from {0} where DateTime < dateadd(day, -{1}, getdate())";
 
-        string _tableName;
-        string _connectionString;
-        char _idSplitChar;
-        int _timeout;
-        int _daysToKeep;
-        int _messageBatch;
-        TimeSpan _forceFlush;
-        DateTime _lastFlush;
-        DateTime _lastCleanup;
-        List<LogItem> _messageList = new List<LogItem>();
+        string tableName;
+        string connectionString;
+        char idSplitChar;
+        int timeout;
+        int daysToKeep;
+        int messageBatch;
+        TimeSpan forceFlush;
+        DateTime lastFlush;
+        DateTime lastCleanup;
+        List<LogItem> messageList = new List<LogItem>();
 
         private void Query(string query, Action<SqlCommand> cAction)
         {
-            using (var connection = new SqlConnection(_connectionString))
+            using (var connection = new SqlConnection(connectionString))
             {
                 try
                 {
@@ -67,38 +67,38 @@ delete from {0} where DateTime < dateadd(day, -{1}, getdate())";
 
         private void CreateTable()
         {
-            Query(string.Format(CreateTableQuery, _tableName),
+            Query(string.Format(CreateTableQuery, tableName),
                 command => command.ExecuteNonQuery());
         }
 
         public LogDatabaseWriter(IOptions options)
         {
-            _connectionString = options["LogConnectionString"];
-            _tableName = options["LogWriteTable"];
-            _timeout = options.GetInt("LogDataFlush", 500);
-            _messageBatch = options.GetInt("LogMessageBatch");
-            if (_messageBatch > 50 || _messageBatch < 1)
+            connectionString = options["LogConnectionString"];
+            tableName = options["LogWriteTable"];
+            timeout = options.GetInt("LogDataFlush", 500);
+            messageBatch = options.GetInt("LogMessageBatch");
+            if (messageBatch > 50 || messageBatch < 1)
             {
-                _messageBatch = 2;
+                messageBatch = 2;
             }
             string idSplit = options["LogIDSplitChar"];
-            _daysToKeep = options.GetInt("LogDaysToKeep");
-            if (_daysToKeep < 1 || _daysToKeep > 365)
+            daysToKeep = options.GetInt("LogDaysToKeep");
+            if (daysToKeep < 1 || daysToKeep > 365)
             {
-                _daysToKeep = 14;
+                daysToKeep = 14;
             }
-            _idSplitChar = idSplit == string.Empty ? ' ' : idSplit[0];
-            _forceFlush = TimeSpan.FromSeconds((double)_timeout / 500);
-            _lastFlush = DateTime.Now;
-            _lastCleanup = DateTime.Now - TimeSpan.FromHours(1);
+            idSplitChar = idSplit == string.Empty ? ' ' : idSplit[0];
+            forceFlush = TimeSpan.FromSeconds((double)timeout / 500);
+            lastFlush = DateTime.Now;
+            lastCleanup = DateTime.Now - TimeSpan.FromHours(1);
             CreateTable();
         }
 
 
         public void Write(LogItem message)
         {
-            _messageList.Add(message);
-            if (DateTime.Now - _lastFlush > _forceFlush || _messageList.Count >= _messageBatch)
+            messageList.Add(message);
+            if (DateTime.Now - lastFlush > forceFlush || messageList.Count >= messageBatch)
             {
                 Flush();
             }
@@ -106,9 +106,9 @@ delete from {0} where DateTime < dateadd(day, -{1}, getdate())";
 
         private void Cleanup()
         {
-            if (DateTime.Now - _lastCleanup > TimeSpan.FromHours(1))
+            if (DateTime.Now - lastCleanup > TimeSpan.FromHours(1))
             {
-                Query(string.Format(CleanupQuery, _tableName, _daysToKeep),
+                Query(string.Format(CleanupQuery, tableName, daysToKeep),
                 command => command.ExecuteNonQuery());
             }
         }
@@ -116,13 +116,13 @@ delete from {0} where DateTime < dateadd(day, -{1}, getdate())";
         public void Flush()
         {
             Cleanup();
-            if (_messageList.Count == 0)
+            if (messageList.Count == 0)
             {
                 return;
             }
             var values = new StringBuilder();
 
-            for (int n = 0; n < _messageList.Count; n++)
+            for (int n = 0; n < messageList.Count; n++)
             {
                 if (n != 0)
                 {
@@ -131,29 +131,29 @@ delete from {0} where DateTime < dateadd(day, -{1}, getdate())";
                 values.Append(string.Format(ValueFormat, n));
             }
 
-            Query(string.Format(InsertQuery, _tableName, values),
+            Query(string.Format(InsertQuery, tableName, values),
             command =>
             {
-                for (int n = 0; n < _messageList.Count; n++)
+                for (int n = 0; n < messageList.Count; n++)
                 {
-                    command.Parameters.Add("@date" + n, SqlDbType.DateTime).Value = _messageList[n].Time;
-                    command.Parameters.Add("@cat" + n, SqlDbType.NVarChar, 100).Value = _messageList[n].Category;
-                    command.Parameters.Add("@level" + n, SqlDbType.Int).Value = _messageList[n].Level;
-                    command.Parameters.Add("@id" + n, SqlDbType.Int).Value = _messageList[n].Ids[0];
-                    command.Parameters.Add("@message" + n, SqlDbType.NVarChar).Value = _messageList[n].Message;
-                    string exMessage = _messageList[n].Ex == null ? string.Empty : _messageList[n].Ex.Message;
-                    string stackTrace = _messageList[n].Ex == null ? string.Empty : _messageList[n].Ex.StackTrace;
+                    command.Parameters.Add("@date" + n, SqlDbType.DateTime).Value = messageList[n].Time;
+                    command.Parameters.Add("@cat" + n, SqlDbType.NVarChar, 100).Value = messageList[n].Category;
+                    command.Parameters.Add("@level" + n, SqlDbType.Int).Value = messageList[n].Level;
+                    command.Parameters.Add("@id" + n, SqlDbType.Int).Value = messageList[n].Ids[0];
+                    command.Parameters.Add("@message" + n, SqlDbType.NVarChar).Value = messageList[n].Message;
+                    string exMessage = messageList[n].Ex == null ? string.Empty : messageList[n].Ex.Message;
+                    string stackTrace = messageList[n].Ex == null ? string.Empty : messageList[n].Ex.StackTrace;
                     command.Parameters.Add("@ex" + n, SqlDbType.NVarChar).Value = exMessage;
                     command.Parameters.Add("@stack" + n, SqlDbType.NVarChar).Value = stackTrace;
                     values.Clear();
                     bool first = true;
-                    foreach (int id in _messageList[n].Ids)
+                    foreach (int id in messageList[n].Ids)
                     {
                         if (id != default(int))
                         {
                             if (!first)
                             {
-                                values.Append(_idSplitChar);
+                                values.Append(idSplitChar);
                             }
                             first = false;
                             values.Append(id.ToString(CultureInfo.InvariantCulture));
@@ -163,12 +163,12 @@ delete from {0} where DateTime < dateadd(day, -{1}, getdate())";
                 }
                 command.ExecuteNonQuery();
             });
-            _messageList.Clear();
+            messageList.Clear();
         }
 
         public int GetTimeout()
         {
-            return _timeout;
+            return timeout;
         }
     }
 }

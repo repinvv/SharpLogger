@@ -131,7 +131,7 @@
     <Compile Include="LogConstruction\ILogConstructor.cs" />
     <Compile Include="LogConstruction\LogConstructorFactory.cs" />
     <Compile Include="LogDefaultOptions.cs" />
-    <Compile Include="ILogger.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="LoggerContainer.cs" />
     <Compile Include="Loggers\CheckingLogger.cs" />
     <Compile Include="Loggers\InternalLogger.cs" />

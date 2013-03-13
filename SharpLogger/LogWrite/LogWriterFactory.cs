@@ -3,24 +3,23 @@ using SharpOptions;
 
 namespace SharpLogger.LogWrite
 {
-
     class LogWriterFactory
     {
-        IOptions _options;
+        IOptions options;
 
         public LogWriterFactory(IOptions options)
         {
-            _options = options;
+            this.options = options;
         }
 
         public ILogWriter GetWriter()
         {
-            switch (_options["LogWriteTarget"])
+            switch (options["LogWriteTarget"])
             {
                 case "Database":
-                    return new LogDatabaseWriter(_options);
+                    return new LogDatabaseWriter(options);
                 default:
-                    return new LogFileWriter((new LogConstructorFactory(_options)).GetLogConstructor(), _options);
+                    return new LogFileWriter((new LogConstructorFactory(options)).GetLogConstructor(), options);
             }
         }
     }

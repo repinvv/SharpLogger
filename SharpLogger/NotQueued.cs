@@ -9,19 +9,19 @@ namespace SharpLogger
 
         public event Action OnTimeout;
 
-        Timer _timer = new Timer(500);
+        Timer timer = new Timer(500);
 
         public NotQueued()
         {
-            _timer.Elapsed += OnTimedEvent;
+            timer.Elapsed += OnTimedEvent;
         }
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-            lock (_timer)
+            lock (timer)
             {
                 OnTimeout();
-                _timer.Stop();
+                timer.Stop();
             }
         }
 
@@ -30,18 +30,18 @@ namespace SharpLogger
             get { return true; }
         }
 
-        public void SetTimeout(int timeout)
+        public void SetTimeout(int value)
         {
-            _timer.Interval = timeout;
+            timer.Interval = value;
         }
 
         public void Send(LogItem msg)
         {
-            lock (_timer)
+            lock (timer)
             {
                 OnReceive(msg);
-                _timer.Stop();
-                _timer.Start();
+                timer.Stop();
+                timer.Start();
             }
         }
 

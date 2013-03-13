@@ -7,12 +7,12 @@ namespace SharpLogger
     //entry point static class for the logger
     public static class LogAccess
     {
-        static bool _init;
-        static object _sync = new object();
-        static ILogger _nullLogger = new NullLogger();
-        static LogCollector _collector;
-        static LoggerContainer _container;
-        static IOptions _options;
+        static bool init;
+        static object sync = new object();
+        static Logger nullLogger = new NullLogger();
+        static LogCollector collector;
+        static LoggerContainer container;
+        static IOptions options;
 
         static LogAccess()
         {
@@ -23,9 +23,9 @@ namespace SharpLogger
         /// </summary>
         static public void Init()
         {
-            lock (_sync)
+            lock (sync)
             {
-                _options = null;
+                options = null;
                 InitBody();
             }
         }
@@ -68,47 +68,47 @@ namespace SharpLogger
         ///LogDaysToKeep
         static public void Init(IOptions options)
         {
-            lock (_sync)
+            lock (sync)
             {
-                _options = options;
+                LogAccess.options = options;
                 InitBody();
             }
         }
 
         static void InitBody()
         {
-            if (_options == null)
+            if (options == null)
             {
-                _options = new Options("", "Log");
+                options = new Options("", "Log");
             }
-            LogDefaultOptions.AddDefaultOptions(_options);
-            LogLevel.SetLevel(LogLevel.Always, _options[LogDefaultOptions.AlwaysOption]);
-            LogLevel.SetLevel(LogLevel.Fatal,_options[LogDefaultOptions.FatalOption]);
-            LogLevel.SetLevel(LogLevel.Error,_options[LogDefaultOptions.ErrorOption]);
-            LogLevel.SetLevel(LogLevel.Warning,_options[LogDefaultOptions.WarningOption]);
-            LogLevel.SetLevel(LogLevel.Info,_options[LogDefaultOptions.InfoOption]);
-            LogLevel.SetLevel(LogLevel.Event,_options[LogDefaultOptions.EventOption]);
-            LogLevel.SetLevel(LogLevel.Debug,_options[LogDefaultOptions.DebugOption]);
-            LogLevel.SetLevel(LogLevel.All, _options[LogDefaultOptions.AllOption]);
-            LogLevel.SetDefault(_options["LogLevel"]);
+            LogDefaultOptions.AddDefaultOptions(options);
+            LogLevel.SetLevel(LogLevel.Always, options[LogDefaultOptions.AlwaysOption]);
+            LogLevel.SetLevel(LogLevel.Fatal,options[LogDefaultOptions.FatalOption]);
+            LogLevel.SetLevel(LogLevel.Error,options[LogDefaultOptions.ErrorOption]);
+            LogLevel.SetLevel(LogLevel.Warning,options[LogDefaultOptions.WarningOption]);
+            LogLevel.SetLevel(LogLevel.Info,options[LogDefaultOptions.InfoOption]);
+            LogLevel.SetLevel(LogLevel.Event,options[LogDefaultOptions.EventOption]);
+            LogLevel.SetLevel(LogLevel.Debug,options[LogDefaultOptions.DebugOption]);
+            LogLevel.SetLevel(LogLevel.All, options[LogDefaultOptions.AllOption]);
+            LogLevel.SetDefault(options["LogLevel"]);
             
-            if (_collector != null)
+            if (collector != null)
             {
-                _collector.ShutDown();
+                collector.ShutDown();
             }
-            _collector = new LogCollector(new ConcurrentQueued<LogItem>(new PoolThreadStarter()),
-                new LogWriterFactory(_options).GetWriter());
+            collector = new LogCollector(new ConcurrentQueued<LogItem>(new PoolThreadStarter()),
+                new LogWriterFactory(options).GetWriter());
 
-            if (_container == null)
+            if (container == null)
             {
-                _container = new LoggerContainer(category => new CheckingLogger(category, _collector.Send, LogLevel.Default));
+                container = new LoggerContainer(category => new CheckingLogger(category, collector.Send, LogLevel.Default));
             }
             else
             {
-                _container.SetSender(_collector.Send);
+                container.SetSender(collector.Send);
             }
-            _container.DefaultCategory = _options.Get("LogDefaultCategory", "Default");
-            _init = true;
+            container.DefaultCategory = options.Get("LogDefaultCategory", "Default");
+            init = true;
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace SharpLogger
         /// <param name="level"></param>
         public static void SetDefault(int level)
         {
-            lock (_sync)
+            lock (sync)
             {
                 LogLevel.Default = level;
             }
@@ -132,13 +132,13 @@ namespace SharpLogger
         /// <param name="level"></param>
         public static void SetLevel(string category, int level)
         {
-            lock (_sync)
+            lock (sync)
             {
-                if (!_init)
+                if (!init)
                 {
                     InitBody();
                 }
-                _container.SetLevel(category, level);
+                container.SetLevel(category, level);
             }
         }
 
@@ -150,13 +150,13 @@ namespace SharpLogger
         /// <param name="value"></param>
         public static void SetOneLevel(string category, int level, bool value)
         {
-            lock (_sync)
+            lock (sync)
             {
-                if (!_init)
+                if (!init)
                 {
                     InitBody();
                 }
-                _container.SetOneLevel(category, level, value);
+                container.SetOneLevel(category, level, value);
             }
         }
 
@@ -166,13 +166,13 @@ namespace SharpLogger
         /// <param name="level"></param>
         public static void SetLevelForAll(int level)
         {
-            lock (_sync)
+            lock (sync)
             {
-                if (!_init)
+                if (!init)
                 {
                     InitBody();
                 }
-                _container.SetLevelForAll(level);
+                container.SetLevelForAll(level);
             }
         }
 
@@ -183,13 +183,13 @@ namespace SharpLogger
         /// <param name="value"></param>
         public static void SetOneLevelForAll(int level, bool value)
         {
-            lock (_sync)
+            lock (sync)
             {
-                if (!_init)
+                if (!init)
                 {
                     InitBody();
                 }
-                _container.SetOneLevelForAll(level, value);
+                container.SetOneLevelForAll(level, value);
             }
         }
 
@@ -198,16 +198,16 @@ namespace SharpLogger
         /// </summary>
         /// <param name="category"></param>
         /// <returns></returns>
-        public static ILogger GetLogger(string category)
+        public static Logger GetLogger(string category)
         {
-            ILogger logger;
-            lock (_sync)
+            Logger logger;
+            lock (sync)
             {
-                if (!_init)
+                if (!init)
                 {
                     InitBody();
                 }
-                logger = _container.GetLogger(category);
+                logger = container.GetLogger(category);
             }
             return logger;
         }
@@ -216,9 +216,9 @@ namespace SharpLogger
         /// Self explanatory. Gets a null logger that will not send any logs.
         /// </summary>
         /// <returns></returns>
-        public static ILogger GetNullLogger()
+        public static Logger GetNullLogger()
         {
-            return _nullLogger;
+            return nullLogger;
         }
 
         /// <summary>
@@ -226,11 +226,11 @@ namespace SharpLogger
         /// </summary>
         public static void ShutDown()
         {
-            lock (_sync)
+            lock (sync)
             {
-                if (_init)
+                if (init)
                 {
-                    _collector.ShutDown();
+                    collector.ShutDown();
                 }
             }
         }
@@ -246,13 +246,13 @@ namespace SharpLogger
             {
                 return;
             }
-            lock (_sync)
+            lock (sync)
             {
-                if (!_init)
+                if (!init)
                 {
                     InitBody();
                 }
-                _collector.FilterAddID(id);
+                collector.FilterAddID(id);
             }
         }
 
@@ -267,13 +267,13 @@ namespace SharpLogger
             {
                 return;
             }
-            lock (_sync)
+            lock (sync)
             {
-                if (!_init)
+                if (!init)
                 {
                     InitBody();
                 }
-                _collector.FilterRemoveID(id);
+                collector.FilterRemoveID(id);
             }
         }
 
@@ -282,13 +282,13 @@ namespace SharpLogger
         /// </summary>
         public static void FilterClear()
         {
-            lock (_sync)
+            lock (sync)
             {
-                if (!_init)
+                if (!init)
                 {
                     InitBody();
                 }
-                _collector.FilterClear();
+                collector.FilterClear();
             }
         }
     }

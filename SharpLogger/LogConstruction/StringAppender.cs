@@ -5,16 +5,16 @@ namespace SharpLogger.LogConstruction
 {
     class StringAppender : ILogConstructor
     {
-        string _staticString;
+        string staticString;
 
         public StringAppender(String staticString)
         {
-            _staticString = staticString;
+            this.staticString = staticString;
         }
 
         public void ConstructLine(StringBuilder sb, LogItem item)
         {
-            sb.Append(_staticString);
+            sb.Append(staticString);
         }
     }
 }

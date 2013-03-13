@@ -5,15 +5,15 @@ namespace SharpLogger.LogConstruction
 {
     class IDAppender : ILogConstructor
     {
-        string _idSplit;
-        string _bracketLeft;
-        string _bracketRight;
+        string idSplit;
+        string bracketLeft;
+        string bracketRight;
 
         public IDAppender(string idSplit, string bracketLeft, string bracketRight)
         {
-            _bracketLeft = bracketLeft;
-            _bracketRight = bracketRight;
-            _idSplit = string.IsNullOrEmpty(idSplit)
+            this.bracketLeft = bracketLeft;
+            this.bracketRight = bracketRight;
+            this.idSplit = string.IsNullOrEmpty(idSplit)
                 ? " "
                 : idSplit.Substring(0, 1);
         }
@@ -25,14 +25,14 @@ namespace SharpLogger.LogConstruction
             {
                 if (id != default(int))
                 {
-                    sb.Append(first ? _bracketLeft : _idSplit);
+                    sb.Append(first ? bracketLeft : idSplit);
                     first = false;
                     sb.Append(id.ToString(CultureInfo.InvariantCulture));
                 }
             }
             if (!first)
             {
-                sb.Append(_bracketRight);
+                sb.Append(bracketRight);
             }
         }
     }

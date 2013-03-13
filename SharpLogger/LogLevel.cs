@@ -13,13 +13,13 @@
         public const int All = 8;
         public const int Total = 9;
         private static int _default = Info;
-        private static string[] _levels = new string[Total];
+        private static string[] levels = new string[Total];
 
         internal static void SetLevel(int level, string levelString)
         {
             if (isLevelValid(level))
             {
-                _levels[level] = levelString;
+                levels[level] = levelString;
             }
         }
 
@@ -27,16 +27,16 @@
         {
             if (isLevelValid(level))
             {
-                return _levels[level];
+                return levels[level];
             }
-            return _levels[_default];
+            return levels[_default];
         }
 
         internal static void SetDefault(string levelString)
         {
-            for (int n = 0; n < _levels.Length; n++)
+            for (int n = 0; n < levels.Length; n++)
             {
-                if (_levels[n] == levelString)
+                if (levels[n] == levelString)
                 {
                     _default = n;
                     return;
